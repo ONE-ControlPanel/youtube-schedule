@@ -321,9 +321,28 @@
     .stats-bar{grid-template-columns:repeat(3,1fr)}
     .dashboard,.header,.month-tabs-bar{padding-left:20px;padding-right:20px}
   }
+
+/* ===== 黒白テーマトグル ===== */
+#themeToggleBtn {
+  position: fixed; top: 16px; right: 16px; z-index: 99999;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 2px solid #888; background: #fff; color: #000;
+  font-size: 20px; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: transform 0.2s ease;
+}
+#themeToggleBtn:hover { transform: scale(1.1); }
+html[data-theme="light"] { filter: invert(1) hue-rotate(180deg); background: #fff; }
+html[data-theme="light"] img,
+html[data-theme="light"] video,
+html[data-theme="light"] iframe,
+html[data-theme="light"] svg { filter: invert(1) hue-rotate(180deg); }
+/* ===== ここまで ===== */
+
 </style>
 </head>
 <body>
+<button id="themeToggleBtn" title="背景色を切替">🌙</button>
 
 <div class="header">
   <div class="header-left">
@@ -1143,6 +1162,65 @@ var CSV_MAY = 'No,投稿予定日,投稿日変更,曜日,動画 確認,サムネ
 '30,2026/5/30,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
 '31,2026/5/31,,日,空白,空白,楠間さん,さきさん,,,FALSE,,,,,,,,';
 // <<AUTO_UPDATE_MAY_END>>
+
+// ===== 自動同期 (15秒ごとにスプシ再取得) =====
+(function(){
+  var AUTO_SYNC_MS = 15000;
+  var initialDone = false;
+  function silentSync(){
+    if (!initialDone) return;
+    // 既存月キーを記録
+    var prevActive = activeMonth;
+    var prevFilters = JSON.parse(JSON.stringify(filters));
+    var prevSearches = JSON.parse(JSON.stringify(searches));
+    SHEET_URLS.forEach(function(d){
+      var timeout = new Promise(function(_, reject){ setTimeout(function(){ reject(); }, 4000); });
+      Promise.race([fetch(d.url + '&_=' + Date.now()), timeout])
+        .then(function(res){ if(!res.ok) throw new Error(); return res.text(); })
+        .then(function(text){
+          var rows = processCSV(text);
+          if (!rows) return;
+          if (months[d.key]) {
+            months[d.key].rows = rows;
+          } else {
+            months[d.key] = { label: d.label, rows: rows };
+            filters[d.key] = 'all';
+            searches[d.key] = '';
+            createDashboard(d.key);
+          }
+          renderTabs();
+          if (activeMonth) renderDashboard(activeMonth);
+        })
+        .catch(function(){});
+    });
+  }
+  // 初回ロード完了を検知する仕組み: loadBuiltinDataをラップ
+  var origLoad = loadBuiltinData;
+  loadBuiltinData = function(){
+    origLoad.apply(this, arguments);
+    setTimeout(function(){ initialDone = true; }, 5000);
+  };
+  setInterval(silentSync, AUTO_SYNC_MS);
+})();
+
+// ===== テーマトグル =====
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('themeToggleBtn');
+  if (!btn) return;
+  var saved = localStorage.getItem('theme') || 'dark';
+  apply(saved);
+  btn.addEventListener('click', function(){
+    var now = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    apply(now);
+    localStorage.setItem('theme', now);
+  });
+  function apply(t) {
+    root.setAttribute('data-theme', t);
+    btn.textContent = t === 'light' ? '🌙' : '☀️';
+  }
+})();
+
 </script>
 </body>
 </html>
