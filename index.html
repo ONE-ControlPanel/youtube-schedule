@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube投稿スケジュール管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a28;
+    --border: #2a2a40;
+    --accent: #ff3c6e;
+    --accent2: #7c4dff;
+    --accent3: #00e5a0;
+    --accent4: #ff9500;
+    --text: #e8e8f0;
+    --text-muted: #6b6b88;
+    --text-dim: #3a3a55;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  .header {
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, #0a0a0f 0%, #12081e 100%);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo { width: 36px; height: 36px; background: var(--accent); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .title { font-size: 17px; font-weight: 700; }
+  .subtitle { font-size: 10px; color: var(--text-muted); font-family: 'Space Mono'; margin-top: 2px; }
+  .today-badge { background: var(--surface2); border: 1px solid var(--border); padding: 7px 14px; border-radius: 20px; font-family: 'Space Mono'; font-size: 11px; color: var(--accent3); }
+
+  .month-tabs-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; align-items: flex-end; gap: 0;
+    overflow-x: auto;
+  }
+  .month-tab {
+    padding: 14px 24px 12px;
+    border: none; border-bottom: 3px solid transparent;
+    background: none; color: var(--text-muted);
+    cursor: pointer; font-family: 'Noto Sans JP'; font-size: 14px; font-weight: 500;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .month-tab:hover { color: var(--text); }
+  .month-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .tab-meta { font-size: 10px; font-family: 'Space Mono'; color: var(--text-dim); }
+  .month-tab.active .tab-meta { color: var(--accent); }
+  .progress-mini { height: 3px; background: var(--surface2); border-radius: 2px; width: 56px; overflow: hidden; }
+  .progress-mini-fill { height: 100%; background: var(--accent3); border-radius: 2px; }
+  .tab-add { padding: 14px 16px 12px; border: none; background: none; color: var(--text-dim); cursor: pointer; font-size: 18px; transition: color 0.2s; }
+  .tab-add:hover { color: var(--accent3); }
+
+  .dashboard { padding: 28px 40px; max-width: 1400px; margin: 0 auto; display: none; }
+  .dashboard.active { display: block; }
+
+  .stats-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; position: relative; overflow: hidden; cursor: pointer; transition: transform 0.15s, border-color 0.15s; }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card.active-filter { box-shadow: 0 0 0 2px var(--accent2); }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .stat-total::before { background: var(--accent2); }
+  .stat-done::before { background: var(--accent3); }
+  .stat-inprogress::before { background: var(--accent4); }
+  .stat-upcoming::before { background: var(--accent); }
+  .stat-pending::before { background: var(--text-muted); }
+  .stat-label { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+  .stat-value { font-size: 30px; font-weight: 900; font-family: 'Space Mono'; line-height: 1; }
+  .stat-total .stat-value { color: var(--accent2); }
+  .stat-done .stat-value { color: var(--accent3); }
+  .stat-inprogress .stat-value { color: var(--accent4); }
+  .stat-upcoming .stat-value { color: var(--accent); }
+  .stat-pending .stat-value { color: var(--text-muted); }
+
+  .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .filter-btn { padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; font-family: 'Noto Sans JP'; font-size: 12px; transition: all 0.2s; }
+  .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--accent); background: #1a0a10; }
+  .search-box { margin-left: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; color: var(--text); font-family: 'Noto Sans JP'; font-size: 12px; width: 220px; outline: none; }
+  .search-box:focus { border-color: var(--accent2); }
+
+  .table-wrapper { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
+  th { padding: 12px 14px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 500; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; cursor: pointer; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr.is-today { background: #12081e; border-left: 3px solid var(--accent); }
+  tbody tr.is-past { opacity: 0.45; }
+  td { padding: 12px 14px; font-size: 13px; vertical-align: middle; }
+  .date-cell { font-family: 'Space Mono'; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+  .weekday-tag { display: block; font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+  .today-marker { display: inline-block; background: var(--accent); color: white; font-size: 9px; padding: 2px 5px; border-radius: 3px; font-family: 'Space Mono'; vertical-align: middle; margin-left: 5px; }
+  .changed-badge { display: inline-block; background: #1a0a10; border: 1px solid var(--accent); color: var(--accent); font-size: 9px; padding: 1px 5px; border-radius: 3px; margin-top: 3px; display: block; width: fit-content; }
+  .title-cell { max-width: 260px; }
+  .video-title { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .no-title { color: var(--text-dim); font-style: italic; font-size: 12px; }
+  .person-tag { display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+  .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 6px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+  .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+  .s-posted { background: #0a0a20; color: var(--accent); border: 1px solid #2a0a1e; }
+  .s-posted::before { background: var(--accent); }
+  .s-complete { background: #0a2018; color: var(--accent3); border: 1px solid #1a4030; }
+  .s-complete::before { background: var(--accent3); }
+  .s-review { background: #1a1500; color: var(--accent4); border: 1px solid #3a3000; }
+  .s-review::before { background: var(--accent4); animation: pulse 1.5s infinite; }
+  .s-inprogress { background: #0e0820; color: var(--accent2); border: 1px solid #2a1a50; }
+  .s-inprogress::before { background: var(--accent2); }
+  .s-pending { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+  .s-pending::before { background: var(--text-muted); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; width: 560px; max-height: 82vh; overflow-y: auto; position: relative; animation: modalIn 0.22s ease; }
+  @keyframes modalIn { from{transform:translateY(16px) scale(0.97);opacity:0} to{transform:none;opacity:1} }
+  .modal-close { position: absolute; top: 18px; right: 18px; background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 30px; height: 30px; border-radius: 7px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .modal-close:hover { background: var(--border); }
+  .modal-date { font-family: 'Space Mono'; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; line-height: 1.5; }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .modal-section { margin-bottom: 14px; }
+  .modal-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 5px; }
+  .modal-section-value { font-size: 13px; }
+  .modal-link { color: var(--accent2); text-decoration: none; font-size: 11px; font-family: 'Space Mono'; word-break: break-all; }
+  .modal-link:hover { text-decoration: underline; }
+  .checklist { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+  .check-item { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; }
+  .check-box { width: 17px; height: 17px; border: 2px solid var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+  .check-item.checked .check-box { background: var(--accent3); border-color: var(--accent3); color: #000; }
+  .check-item.checked { border-color: #1a4030; opacity: 0.75; }
+  .check-label { font-size: 12px; }
+  .check-value { margin-left: auto; font-size: 11px; color: var(--text-muted); }
+
+  .upload-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 300; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+  .upload-modal.open { display: flex; }
+  .upload-box { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 40px; width: 480px; text-align: center; }
+  .upload-box h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .upload-box p { color: var(--text-muted); font-size: 13px; margin-bottom: 24px; }
+  .drop-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 36px; cursor: pointer; transition: all 0.2s; }
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent3); background: #0a1a10; }
+  .drop-icon { font-size: 36px; margin-bottom: 10px; }
+  .drop-label { font-size: 14px; color: var(--text-muted); }
+  .btn { padding: 10px 22px; border-radius: 8px; border: none; cursor: pointer; font-family: 'Noto Sans JP'; font-size: 13px; font-weight: 500; transition: opacity 0.2s; }
+  .btn-secondary { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+  .btn:hover { opacity: 0.85; }
+  .upload-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+
+  .welcome { padding: 60px 40px; max-width: 700px; margin: 0 auto; text-align: center; }
+  .welcome h2 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+  .welcome p { color: var(--text-muted); font-size: 14px; line-height: 1.7; margin-bottom: 32px; }
+  .welcome-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .welcome-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; cursor: pointer; transition: all 0.2s; }
+  .welcome-card:hover { border-color: var(--accent2); background: #12081e; }
+  .card-icon { font-size: 28px; margin-bottom: 10px; }
+  .welcome-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .welcome-card p { font-size: 12px; color: var(--text-muted); }
+  .empty-state { text-align: center; padding: 50px; color: var(--text-dim); }
+
+  /* YouTube action area */
+  .yt-action-box {
+    background: linear-gradient(135deg, #0f0a1a 0%, #0a1020 100%);
+    border: 1px solid #2a1a50;
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 4px;
+  }
+  .yt-action-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .yt-action-title::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: #ff0000;
+    border-radius: 2px;
+  }
+  .yt-btn-group { display: flex; flex-direction: column; gap: 10px; }
+  .yt-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    width: 100%;
+    text-align: left;
+  }
+  .yt-btn:hover { border-color: var(--accent2); background: #140e28; transform: translateX(2px); }
+  .yt-btn.yt-btn-primary { border-color: #ff0000; background: #1a0505; }
+  .yt-btn.yt-btn-primary:hover { background: #280808; border-color: #ff3333; }
+  .yt-btn.yt-btn-studio { border-color: #2a2a60; }
+  .yt-btn.yt-btn-studio:hover { border-color: var(--accent2); }
+  .yt-btn.yt-btn-mark { border-color: #1a4030; }
+  .yt-btn.yt-btn-mark:hover { border-color: var(--accent3); background: #0a1a10; }
+  .yt-btn.yt-btn-mark.marked { background: #0a2018; border-color: var(--accent3); color: var(--accent3); }
+  .yt-btn-icon { font-size: 18px; flex-shrink: 0; width: 24px; text-align: center; }
+  .yt-btn-text { flex: 1; }
+  .yt-btn-text .yt-btn-label { font-size: 13px; font-weight: 500; }
+  .yt-btn-text .yt-btn-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .yt-btn.yt-btn-primary .yt-btn-text .yt-btn-desc { color: #ff8888; }
+  .yt-btn-arrow { color: var(--text-dim); font-size: 12px; }
+
+  /* Schedule picker */
+  .schedule-picker {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 2px;
+    animation: fadeIn 0.2s ease;
+  }
+  .schedule-picker.open { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+  .schedule-picker label { font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 5px; }
+  .schedule-picker input[type="datetime-local"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    margin-bottom: 10px;
+  }
+  .schedule-picker input[type="datetime-local"]:focus { border-color: var(--accent2); }
+  .schedule-actions { display: flex; gap: 8px; }
+  .schedule-go-btn {
+    flex: 1;
+    padding: 9px;
+    background: #ff0000;
+    border: none;
+    border-radius: 7px;
+    color: white;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: opacity 0.2s;
+    text-decoration: none;
+  }
+  .schedule-go-btn:hover { opacity: 0.85; }
+  .schedule-cancel-btn {
+    padding: 9px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text-muted);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .schedule-cancel-btn:hover { border-color: var(--accent); color: var(--text); }
+  .yt-posted-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #0a2018;
+    border: 1px solid var(--accent3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--accent3);
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  #upload-file-input { display: none; }
+
+  /* 素材URL反映モーダル */
+  .material-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:400; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
+  .material-modal.open { display:flex; }
+  .material-box { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:32px; width:520px; max-height:85vh; overflow-y:auto; }
+  .material-box h3 { font-size:17px; font-weight:700; margin-bottom:6px; }
+  .material-box .sub { font-size:12px; color:var(--text-muted); margin-bottom:20px; line-height:1.6; }
+  .sunday-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+  .sunday-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+  .sunday-date { font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:var(--accent3); margin-bottom:8px; }
+  .sunday-url-input { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:7px 10px; color:var(--text); font-family:'Space Mono',monospace; font-size:11px; outline:none; margin-bottom:4px; }
+  .sunday-url-input:focus { border-color:var(--accent2); }
+  .sunday-current { font-size:10px; color:var(--accent3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .sunday-source { font-size:10px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .material-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:4px; }
+  .mat-btn { padding:10px 20px; border-radius:8px; border:none; cursor:pointer; font-family:'Noto Sans JP',sans-serif; font-size:13px; font-weight:600; transition:opacity 0.2s; }
+  .mat-btn:hover { opacity:0.85; }
+  .mat-btn-apply { background:var(--accent3); color:#000; }
+  .mat-btn-cancel { background:var(--surface2); border:1px solid var(--border); color:var(--text); }
+  @media(max-width:900px){
+    .stats-bar{grid-template-columns:repeat(3,1fr)}
+    .dashboard,.header,.month-tabs-bar{padding-left:20px;padding-right:20px}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">&#9654;</div>
+    <div>
+      <div class="title">YouTube投稿スケジュール</div>
+      <div class="subtitle">PRODUCTION TRACKER</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <button onclick="resetToWelcome()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);padding:7px 14px;border-radius:20px;font-family:'Noto Sans JP',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">↺ 最新データを読み込む</button>
+    <button onclick="openMaterialDirectModal()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);padding:7px 14px;border-radius:20px;font-family:'Noto Sans JP',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent3)';this.style.color='var(--accent3)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">📎 素材URL①を反映</button>
+    <div class="today-badge" id="today-display">Loading...</div>
+  </div>
+</div>
+
+<div class="month-tabs-bar" id="month-tabs-bar" style="display:none">
+  <button class="tab-add" id="tab-add-btn" title="月を追加" onclick="openUploadModal()">＋ 月を追加</button>
+</div>
+
+<div id="welcome-screen">
+  <div class="welcome">
+    <div style="font-size:48px;margin-bottom:16px">&#128197;</div>
+    <h2>YouTube投稿スケジュール管理</h2>
+    <p>CSVファイルをアップロードして月ごとの進捗を管理しましょう。</p>
+    <div class="welcome-grid">
+      <div class="welcome-card" onclick="openMaterialDirectModal()">
+        <div class="card-icon">📎</div>
+        <h3>素材URL①を反映</h3>
+        <p>ギガファイル便のURLを日曜日に貼り付けて反映</p>
+      </div>
+      <div class="welcome-card" onclick="loadBuiltinData()">
+        <div class="card-icon">&#128257;</div>
+        <h3>最新データを読み込む</h3>
+        <p>Googleスプレッドシートから3〜5月を自動取得</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="dashboards-container"></div>
+
+<div class="upload-modal" id="upload-modal">
+  <div class="upload-box">
+    <h3>&#128194; 月のCSVを追加</h3>
+    <p>追加したい月のCSVファイルをアップロードしてください<br>（複数ファイル同時対応）</p>
+    <div class="drop-zone" id="modal-drop-zone" onclick="document.getElementById('upload-file-input').click()">
+      <div class="drop-icon">&#11014;&#65039;</div>
+      <div class="drop-label">クリックまたはドロップ</div>
+    </div>
+    <input type="file" id="upload-file-input" accept=".csv" multiple>
+    <div class="upload-actions">
+      <button class="btn btn-secondary" onclick="closeUploadModal()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- 素材URL反映モーダル -->
+<div class="material-modal" id="material-modal">
+  <div class="material-box">
+    <h3>&#127916; 素材URL①を日曜日に反映</h3>
+    <p class="sub">CSVから読み込んだ素材URL①を、どの日曜日に反映するか選んでください。<br>入力欄を空にすると反映しません。後から変更も可能です。</p>
+    <div class="sunday-list" id="sunday-list"></div>
+    <div class="material-actions">
+      <button class="mat-btn mat-btn-cancel" onclick="closeMaterialModal()">キャンセル</button>
+      <button class="mat-btn mat-btn-apply" onclick="applyMaterialUrls()">&#10003; 反映する</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="closeDetailModal(event)">
+  <div class="modal" id="modal-content">
+    <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">&#10005;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+var months = {};
+var activeMonth = null;
+var filters = {};
+var searches = {};
+
+var today = new Date();
+today.setHours(0,0,0,0);
+document.getElementById('today-display').textContent = today.toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'});
+
+function parseCSVText(text) {
+  var lines = text.split(/\r?\n/);
+  return lines.map(function(line) {
+    var cols = [], cur = '', inQ = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else { cur += c; }
+    }
+    cols.push(cur.trim());
+    return cols;
+  });
+}
+
+function getField(obj, keys) {
+  for (var k = 0; k < keys.length; k++) {
+    var key = keys[k].replace(/\s/g,'');
+    var objKeys = Object.keys(obj);
+    for (var j = 0; j < objKeys.length; j++) {
+      if (objKeys[j].replace(/\s/g,'').indexOf(key) !== -1) return obj[objKeys[j]];
+    }
+  }
+  return '';
+}
+
+function processCSV(text) {
+  var rows = parseCSVText(text);
+  var hi = -1;
+  for (var i = 0; i < rows.length; i++) { if (rows[i][0] === 'No') { hi = i; break; } }
+  if (hi === -1) return null;
+  var headers = rows[hi];
+  var dataRows = rows.slice(hi+1).filter(function(r){ return r[0] && /^\d+$/.test(r[0].trim()); });
+  return dataRows.map(function(r) {
+    var o = {};
+    headers.forEach(function(h,i){ o[h.replace(/\n/g,' ')] = (r[i]||'').trim(); });
+    var item = {
+      no: parseInt(o['No'])||0,
+      dateStr: getField(o,['投稿予定日']),
+      changedDate: getField(o,['投稿日変更']),
+      weekday: getField(o,['曜日']),
+      videoCheck: getField(o,['動画 確認','動画確認']),
+      thumbCheck: getField(o,['サムネ 確認','サムネ確認']),
+      videoStaff: getField(o,['動画 担当','動画担当']),
+      thumbStaff: getField(o,['サムネ担当']),
+      title: getField(o,['動画タイトル']),
+      notes: getField(o,['編集者さんへ']),
+      reserved: getField(o,['予約投稿したか','予約投稿']),
+      deliveryUrl: getField(o,['動画納品URL']),
+      reviewUrl: getField(o,['校正依頼動画URL']),
+      materialUrl1: getField(o,['素材URL①']),
+      materialUrl2: getField(o,['素材URL②']),
+      thumbUrl: getField(o,['サムネ納品URL']),
+      thumbIdea: getField(o,['サムネ画像案']),
+      youtubeLink: getField(o,['YouTubeリンク']),
+    };
+    var ds = item.changedDate || item.dateStr;
+    if (ds) {
+      var p = ds.split('/');
+      if (p.length===3) { item.date = new Date(+p[0],+p[1]-1,+p[2]); item.date.setHours(0,0,0,0); }
+    }
+    if (item.dateStr) {
+      var p2 = item.dateStr.split('/');
+      if (p2.length===3) { item.origDate = new Date(+p2[0],+p2[1]-1,+p2[2]); item.origDate.setHours(0,0,0,0); }
+    }
+    // 曜日はDateオブジェクトから正確に再計算
+    var dowNames = ['日','月','火','水','木','金','土'];
+    if (item.date) item.weekday = dowNames[item.date.getDay()];
+    else if (item.origDate) item.weekday = dowNames[item.origDate.getDay()];
+    return item;
+  });
+}
+
+function detectMonthKey(rows) {
+  for (var i = 0; i < rows.length; i++) {
+    var d = rows[i].date || rows[i].origDate;
+    if (d) return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+  }
+  return null;
+}
+
+function addMonth(rows, key, label) {
+  months[key] = { label: label, rows: rows };
+  filters[key] = 'all';
+  searches[key] = '';
+  createDashboard(key);
+  renderTabs();
+  setActiveMonth(key);
+  document.getElementById('welcome-screen').style.display = 'none';
+  document.getElementById('month-tabs-bar').style.display = 'flex';
+}
+
+function getStatus(item) {
+  if (item.reserved === 'TRUE' || item.youtubeLink) return 'posted';
+  var vc = (item.videoCheck||'').replace(/\s/g,'');
+  var tc = (item.thumbCheck||'').replace(/\s/g,'');
+  var vcOk = vc==='校正済み'||vc==='確認済';
+  var tcOk = tc==='校正済み'||tc==='確認済';
+  var vcReview = vc==='確認依頼'||vc==='校正依頼';
+  var tcReview = tc==='確認依頼'||tc==='校正依頼';
+  if (vcOk && tcOk) return 'complete';
+  if (tcReview || vcReview) return 'review';
+  if (item.deliveryUrl||item.reviewUrl||item.materialUrl1||item.materialUrl2||item.thumbUrl||item.videoStaff||item.thumbStaff||item.title) return 'inprogress';
+  // 何も入力がない完全空行は 'empty' として未着手から除外
+  return 'empty';
+}
+
+function statusBadge(s) {
+  var map = {
+    posted: ['s-posted','&#10003; 投稿済み'],
+    complete: ['s-complete','&#10003; 確認完了'],
+    review: ['s-review','&#9711; 確認依頼中'],
+    inprogress: ['s-inprogress','&#9654; 制作中'],
+    pending: ['s-pending','&#8212; 未着手'],
+    empty: ['s-pending','&#8212; 未設定']
+  };
+  var m = map[s]||map.pending;
+  return '<span class="status-badge '+m[0]+'">'+m[1]+'</span>';
+}
+
+function calcStats(rows) {
+  var seven = new Date(today); seven.setDate(seven.getDate()+7);
+  var total=0, done=0, inprogress=0, pending=0, upcoming=0;
+  rows.forEach(function(r) {
+    var s = getStatus(r);
+    if (s!=='empty') total++;
+    if (s==='posted') done++;
+    else if (s==='inprogress'||s==='review'||s==='complete') inprogress++;
+    else if (s==='pending') pending++;
+    if (r.date && r.date>=today && r.date<=seven) upcoming++;
+  });
+
+
+
+
+
+
+
+  return {total:total, done:done, inprogress:inprogress, pending:pending, upcoming:upcoming};
+}
+
+function renderTabs() {
+  var bar = document.getElementById('month-tabs-bar');
+  var addBtn = document.getElementById('tab-add-btn');
+  bar.querySelectorAll('.month-tab').forEach(function(t){ t.remove(); });
+  var sorted = Object.keys(months).sort();
+  sorted.forEach(function(key) {
+    var m = months[key];
+    var st = calcStats(m.rows);
+    var pct = st.total ? Math.round(st.done/st.total*100) : 0;
+    var btn = document.createElement('button');
+    btn.className = 'month-tab' + (key===activeMonth?' active':'');
+    btn.dataset.key = key;
+    btn.innerHTML = m.label +
+      '<span class="tab-meta">'+st.done+'/'+st.total+' 投稿済</span>' +
+      '<div class="progress-mini"><div class="progress-mini-fill" style="width:'+pct+'%"></div></div>';
+    btn.onclick = function(){ setActiveMonth(this.dataset.key); };
+    bar.insertBefore(btn, addBtn);
+  });
+}
+
+function setActiveMonth(key) {
+  activeMonth = key;
+  document.querySelectorAll('.month-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.key===key); });
+  document.querySelectorAll('.dashboard').forEach(function(d){ d.classList.toggle('active', d.dataset.key===key); });
+  if (months[key]) renderDashboard(key);
+}
+
+function createDashboard(key) {
+  var ex = document.querySelector('.dashboard[data-key="'+key+'"]');
+  if (ex) ex.remove();
+  var div = document.createElement('div');
+  div.className = 'dashboard';
+  div.dataset.key = key;
+  div.innerHTML = '<div class="stats-bar">' +
+    '<div class="stat-card stat-total" onclick="setFilterFromCard(\''+key+'\',\'all\')" title="すべて表示"><div class="stat-label">総投稿数</div><div class="stat-value" id="st-total-'+key+'">0</div></div>' +
+    '<div class="stat-card stat-done" onclick="setFilterFromCard(\''+key+'\',\'posted\')" title="投稿済みを表示"><div class="stat-label">投稿済み</div><div class="stat-value" id="st-done-'+key+'">0</div></div>' +
+    '<div class="stat-card stat-inprogress" onclick="setFilterFromCard(\''+key+'\',\'inprogress\')" title="制作中を表示"><div class="stat-label">制作中</div><div class="stat-value" id="st-inprogress-'+key+'">0</div></div>' +
+    '<div class="stat-card stat-upcoming" onclick="setFilterFromCard(\''+key+'\',\'week\')" title="今後7日を表示"><div class="stat-label">今後7日</div><div class="stat-value" id="st-upcoming-'+key+'">0</div></div>' +
+    '<div class="stat-card stat-pending" onclick="setFilterFromCard(\''+key+'\',\'pending\')" title="未着手を表示"><div class="stat-label">未着手</div><div class="stat-value" id="st-pending-'+key+'">0</div></div>' +
+    '</div>' +
+    '<div class="controls" id="ctrl-'+key+'">' +
+    '<button class="filter-btn active" onclick="setFilter(\''+key+'\',\'all\',this)">すべて</button>' +
+    '<button class="filter-btn" onclick="setFilter(\''+key+'\',\'today\',this)">今日</button>' +
+    '<button class="filter-btn" onclick="setFilter(\''+key+'\',\'week\',this)">今後7日</button>' +
+    '<button class="filter-btn" onclick="setFilter(\''+key+'\',\'inprogress\',this)">制作中</button>' +
+    '<button class="filter-btn" onclick="setFilter(\''+key+'\',\'posted\',this)">投稿済み</button>' +
+    '<button class="filter-btn" onclick="setFilter(\''+key+'\',\'pending\',this)">未着手</button>' +
+    '<input type="text" class="search-box" placeholder="タイトル・担当者で検索..." oninput="setSearch(\''+key+'\',this.value)">' +
+    '</div>' +
+    '<div class="table-wrapper"><table>' +
+    '<thead><tr><th>No</th><th>投稿予定日</th><th>動画タイトル</th><th>動画担当</th><th>サムネ担当</th><th>ステータス</th><th>動画確認</th><th>サムネ確認</th><th>予約投稿</th></tr></thead>' +
+    '<tbody id="tbody-'+key+'"></tbody></table></div>';
+  document.getElementById('dashboards-container').appendChild(div);
+}
+
+function renderDashboard(key) {
+  var m = months[key];
+  var st = calcStats(m.rows);
+  document.getElementById('st-total-'+key).textContent = st.total;
+  document.getElementById('st-done-'+key).textContent = st.done;
+  document.getElementById('st-inprogress-'+key).textContent = st.inprogress;
+  document.getElementById('st-upcoming-'+key).textContent = st.upcoming;
+  document.getElementById('st-pending-'+key).textContent = st.pending;
+
+  var filter = filters[key]||'all';
+  var q = (searches[key]||'').toLowerCase();
+  var seven = new Date(today); seven.setDate(seven.getDate()+7);
+
+  var rows = m.rows.filter(function(r) {
+    var s = getStatus(r);
+    if (filter==='today') return r.date && r.date.getTime()===today.getTime();
+    if (filter==='week') return r.date && r.date>=today && r.date<=seven;
+    if (filter==='inprogress') return s==='inprogress'||s==='review'||s==='complete';
+    if (filter==='posted') return s==='posted';
+    if (filter==='pending') return s==='pending';
+    return s!=='empty';
+  });
+  if (q) rows = rows.filter(function(r){ return r.title.toLowerCase().indexOf(q)!==-1||r.videoStaff.toLowerCase().indexOf(q)!==-1||r.thumbStaff.toLowerCase().indexOf(q)!==-1; });
+
+  var tbody = document.getElementById('tbody-'+key);
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state">該当するデータがありません</div></td></tr>'; return; }
+
+  var chk = function(v) {
+    v = (v||'').replace(/\s/g,'');
+    if (v==='校正済み'||v==='確認済') return '<span style="color:var(--accent3)">&#10003;</span>';
+    if (v==='確認依頼'||v==='校正依頼') return '<span style="color:var(--accent4)">&#9679;</span>';
+    return '<span style="color:var(--text-dim)">&#8212;</span>';
+  };
+
+  tbody.innerHTML = rows.map(function(r) {
+    var isToday = r.date && r.date.getTime()===today.getTime();
+    var s = getStatus(r);
+    var isPast = r.date && r.date < today && s!=='posted';
+    var trClass = isToday ? 'is-today' : (isPast ? 'is-past' : '');
+    var dateDisp = r.date ? r.date.toLocaleDateString('ja-JP',{month:'2-digit',day:'2-digit'}) : r.dateStr;
+    var todayMark = isToday ? '<span class="today-marker">TODAY</span>' : '';
+    var changed = r.changedDate && r.origDate && r.changedDate!==r.dateStr;
+    var changedMark = changed ? '<span class="changed-badge">&#10149; 日付変更</span>' : '';
+    return '<tr class="'+trClass+'" onclick="showDetail(\''+key+'\','+r.no+')">' +
+      '<td style="font-family:\'Space Mono\';font-size:11px;color:var(--text-muted)">'+r.no+'</td>' +
+      '<td class="date-cell">'+dateDisp+todayMark+changedMark+'<span class="weekday-tag">'+r.weekday+'</span></td>' +
+      '<td class="title-cell">'+(r.title?'<div class="video-title" title="'+r.title+'">'+r.title+'</div>':'<div class="no-title">タイトル未設定</div>')+'</td>' +
+      '<td>'+(r.videoStaff?'<span class="person-tag">'+r.videoStaff+'</span>':'<span style="color:var(--text-dim)">&#8212;</span>')+'</td>' +
+      '<td>'+(r.thumbStaff?'<span class="person-tag">'+r.thumbStaff+'</span>':'<span style="color:var(--text-dim)">&#8212;</span>')+'</td>' +
+      '<td>'+statusBadge(s)+'</td>' +
+      '<td>'+chk(r.videoCheck)+'</td>' +
+      '<td>'+chk(r.thumbCheck)+'</td>' +
+      '<td>'+(r.reserved==='TRUE'?'<span style="color:var(--accent3)">&#10003;</span>':'<span style="color:var(--text-dim)">&#8212;</span>')+'</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function setFilterFromCard(key, f) {
+  filters[key] = f;
+  // フィルターボタンのactive状態を同期
+  var btns = document.querySelectorAll('#ctrl-'+key+' .filter-btn');
+  btns.forEach(function(b){ b.classList.remove('active'); });
+  var filterMap = {all:'すべて', today:'今日', week:'今後7日', inprogress:'制作中', posted:'投稿済み', pending:'未着手'};
+  btns.forEach(function(b){ if(b.textContent === filterMap[f]) b.classList.add('active'); });
+  // stat-cardのactive-filter状態を更新
+  var cardMap = {all:'stat-total', posted:'stat-done', inprogress:'stat-inprogress', week:'stat-upcoming', pending:'stat-pending'};
+  var dash = document.querySelector('.dashboard[data-key="'+key+'"]');
+  if (dash) {
+    dash.querySelectorAll('.stat-card').forEach(function(c){ c.classList.remove('active-filter'); });
+    var target = dash.querySelector('.'+cardMap[f]);
+    if (target) target.classList.add('active-filter');
+  }
+  renderDashboard(key);
+  // テーブルまでスクロール
+  var tbody = document.getElementById('tbody-'+key);
+  if (tbody) tbody.closest('.table-wrapper').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function setFilter(key, f, btn) {
+  filters[key] = f;
+  document.querySelectorAll('#ctrl-'+key+' .filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderDashboard(key);
+}
+function setSearch(key, val) { searches[key] = val; renderDashboard(key); }
+
+function buildYtActionHtml(r) {
+  var itemKey = r._monthKey + '_' + r.no;
+  var currentUrl = r.youtubeLink || '';
+  var isPosted = r.reserved === 'TRUE' || r._markedPosted;
+
+  return '<div class="yt-action-box">' +
+    '<div class="yt-action-title">YouTube</div>' +
+    '<div class="yt-btn-group">' +
+
+    // YouTubeリンク入力欄（常に表示）
+    '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;">' +
+      '<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">YouTubeリンク</div>' +
+      '<div style="display:flex;gap:8px;align-items:center;">' +
+        '<input type="text" id="yt-url-'+itemKey+'" placeholder="https://youtu.be/..." value="'+currentUrl+'" ' +
+          'style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:\'Space Mono\',monospace;font-size:11px;outline:none;" ' +
+          'onfocus="this.style.borderColor=\'var(--accent2)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
+        '<button onclick="saveYtLink(\''+r._monthKey+'\','+r.no+',\'yt-url-'+itemKey+'\')" ' +
+          'style="padding:9px 16px;background:var(--accent2);border:none;border-radius:7px;color:white;font-family:\'Noto Sans JP\',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;" ' +
+          'onmouseover="this.style.opacity=\'0.85\'" onmouseout="this.style.opacity=\'1\'">保存</button>' +
+      '</div>' +
+      (currentUrl ?
+        '<a href="'+currentUrl+'" target="_blank" id="yt-preview-'+itemKey+'" ' +
+        'style="display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:11px;color:var(--accent);font-family:\'Space Mono\',monospace;text-decoration:none;">&#9654; 動画を開く</a>' :
+        '<span id="yt-preview-'+itemKey+'" style="display:none;margin-top:10px;font-size:11px;color:var(--accent);font-family:\'Space Mono\',monospace;"></span>'
+      ) +
+    '</div>' +
+
+    // 予約投稿済みマーク（常にボタン表示、状態で色変化）
+    '<button class="yt-btn yt-btn-mark'+(isPosted?' marked':'')+'" onclick="markAsPosted(\''+r._monthKey+'\','+r.no+')">' +
+      '<span class="yt-btn-icon">'+(isPosted?'&#10003;':'&#9711;')+'</span>' +
+      '<span class="yt-btn-text">' +
+        '<div class="yt-btn-label">'+(isPosted?'予約投稿済み':'予約投稿済みとしてマーク')+'</div>' +
+        '<div class="yt-btn-desc">'+(isPosted?'クリックで解除できます':'完了後にステータスを更新する')+'</div>' +
+      '</span>' +
+      (isPosted ? '<span style="font-size:10px;color:var(--accent3);opacity:0.7;">解除</span>' : '') +
+    '</button>' +
+
+    '</div></div>';
+}
+
+function saveYtLink(key, no, inputId) {
+  var r = months[key].rows.find(function(x){ return x.no===no; });
+  var input = document.getElementById(inputId);
+  if (!r || !input) return;
+  var url = input.value.trim();
+  r.youtubeLink = url;
+  // プレビューリンク更新
+  var itemKey = key + '_' + no;
+  var preview = document.getElementById('yt-preview-'+itemKey);
+  if (preview) {
+    if (url) {
+      preview.href = url;
+      preview.innerHTML = '&#9654; 動画を開く';
+      preview.style.display = 'inline-flex';
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+  // 保存フィードバック
+  var btn = input.nextElementSibling;
+  if (btn) {
+    var orig = btn.textContent;
+    btn.textContent = '✓ 保存済み';
+    btn.style.background = 'var(--accent3)';
+    btn.style.color = '#000';
+    setTimeout(function(){ btn.textContent = orig; btn.style.background = 'var(--accent2)'; btn.style.color = 'white'; }, 1500);
+  }
+  renderTabs();
+  renderDashboard(key);
+}
+
+function toggleSchedulePicker(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('open');
+  var key = id.replace('picker-','');
+  var arrow = document.getElementById('picker-arrow-'+key);
+  if (arrow) arrow.textContent = el.classList.contains('open') ? '&#8963;' : '&#8964;';
+}
+
+function updateStudioLink(btnId, dtId, baseUrl) {
+  // 日時をクリップボードにコピーしてStudioを開く
+  var dtEl = document.getElementById(dtId);
+  if (dtEl && dtEl.value) {
+    var dt = new Date(dtEl.value);
+    var formatted = dt.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    try { navigator.clipboard.writeText(formatted); } catch(e) {}
+  }
+  // hrefはそのままstudioUrlを使用（実際のStudio APIは不可なのでページを開くだけ）
+}
+
+function toggleCheck(key, no, field) {
+  var r = months[key].rows.find(function(x){ return x.no===no; });
+  if (!r) return;
+  if (field === '_markedPosted') {
+    r._markedPosted = !r._markedPosted;
+    r.reserved = r._markedPosted ? 'TRUE' : 'FALSE';
+  } else if (field === 'videoCheck') {
+    var cur = (r.videoCheck||'').replace(/\s/g,'');
+    r.videoCheck = (cur === '校正済み' || cur === '確認済') ? '空白' : '確認済';
+  } else if (field === 'thumbCheck') {
+    var cur2 = (r.thumbCheck||'').replace(/\s/g,'');
+    r.thumbCheck = (cur2 === '校正済み' || cur2 === '確認済') ? '空白' : '確認済';
+  }
+  renderTabs();
+  renderDashboard(key);
+  showDetail(key, no);
+}
+
+function markAsPosted(key, no) {
+  var r = months[key].rows.find(function(x){ return x.no===no; });
+  if (!r) return;
+  r._markedPosted = !r._markedPosted;
+  if (r._markedPosted) r.reserved = 'TRUE';
+  else r.reserved = 'FALSE';
+  renderTabs();
+  renderDashboard(key);
+  // モーダルを再描画
+  showDetail(key, no);
+}
+
+function showDetail(key, no) {
+  var r = months[key].rows.find(function(x){ return x.no===no; });
+  if (!r) return;
+  r._monthKey = key;
+  var s = getStatus(r);
+  var dateDisp = r.date ? r.date.toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'long'}) : r.dateStr;
+  var origDisp = (r.changedDate && r.origDate && r.changedDate!==r.dateStr) ? r.origDate.toLocaleDateString('ja-JP',{month:'2-digit',day:'2-digit'}) : null;
+  var link = function(lbl, url) { return url ? '<div class="modal-section"><div class="modal-section-label">'+lbl+'</div><a href="'+url+'" target="_blank" class="modal-link">'+(url.length>60?url.slice(0,60)+'…':url)+'</a></div>' : ''; };
+  var norm = function(v){ v=(v||"").replace(/\s/g,""); return (v&&v!=="空白")?v:""; };
+  var checks = [
+    {label:"動画確認",    field:"videoCheck",    val:norm(r.videoCheck),  toggle:true},
+    {label:"サムネ確認",  field:"thumbCheck",    val:norm(r.thumbCheck),  toggle:true},
+    {label:"予約投稿",    field:"_markedPosted", val:(r.reserved==="TRUE"||r._markedPosted)?"完了":"", toggle:true},
+    {label:"動画納品URL", field:"deliveryUrl",   val:r.deliveryUrl?"あり":"", toggle:false},
+    {label:"サムネ納品URL",field:"thumbUrl",     val:r.thumbUrl?"あり":"",    toggle:false},
+  ];
+  var clHtml = '<div class="modal-section"><div class="modal-section-label">進捗チェックリスト</div><div class="checklist">' +
+    checks.map(function(c) {
+      var done = !!c.val;
+      var cur  = c.toggle ? "cursor:pointer;" : "cursor:default;";
+      var oc   = c.toggle ? ' onclick="toggleCheck(\'"+key+"\',"+no+",\'"+c.field+"\')"' : "";
+      var hint = (done && c.toggle) ? '<span style="margin-left:auto;font-size:10px;color:var(--text-dim);">解除</span>' : "";
+      var vl   = (c.val && c.val!=="完了" && c.val!=="あり") ? '<span class="check-value">'+c.val+'</span>' : "";
+      return '<div class="check-item'+(done?" checked":"")+'" style="'+cur+'"'+oc+'>' +
+        '<div class="check-box">'+(done?"&#10003;":"")+'</div>' +
+        '<span class="check-label">'+c.label+'</span>'+vl+hint+'</div>';
+    }).join("") +
+    '</div></div>';
+  document.getElementById('modal-body').innerHTML =
+    '<div class="modal-date">'+dateDisp+(origDisp?'<span style="font-size:10px;color:var(--text-dim);margin-left:8px">元: '+origDisp+'</span>':'')+'</div>' +
+    '<div class="modal-title">'+(r.title||'タイトル未設定')+'</div>' +
+    statusBadge(s) +
+    '<div class="divider"></div>' +
+    '<div class="modal-grid"><div class="modal-section"><div class="modal-section-label">動画担当</div><div class="modal-section-value">'+(r.videoStaff||'&#8212;')+'</div></div>' +
+    '<div class="modal-section"><div class="modal-section-label">サムネ担当</div><div class="modal-section-value">'+(r.thumbStaff||'&#8212;')+'</div></div></div>' +
+    clHtml +
+    (r.notes?'<div class="modal-section"><div class="modal-section-label">共有事項</div><div class="modal-section-value" style="font-size:12px;line-height:1.7;white-space:pre-wrap;color:var(--text-muted)">'+r.notes+'</div></div>':'') +
+    '<div class="divider"></div>' +
+    link('動画納品URL',r.deliveryUrl) + link('校正依頼URL',r.reviewUrl) +
+    link('素材URL①',r.materialUrl1) + link('素材URL②',r.materialUrl2) +
+    link('サムネ納品URL',r.thumbUrl) + link('YouTubeリンク',r.youtubeLink) +
+    (r.thumbIdea?'<div class="modal-section"><div class="modal-section-label">サムネ画像案</div><div class="modal-section-value" style="font-size:11px;line-height:1.6;white-space:pre-wrap;color:var(--text-muted)">'+r.thumbIdea+'</div></div>':'') +
+    '<div class="divider"></div>' +
+    buildYtActionHtml(r);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeDetailModal(e) { if(e.target===document.getElementById('modal-overlay')) document.getElementById('modal-overlay').classList.remove('open'); }
+
+document.getElementById('material-modal').addEventListener('click', function(e){ if(e.target===this) closeMaterialModal(); });
+
+function openUploadModal() { document.getElementById('upload-modal').classList.add('open'); }
+function closeUploadModal() { document.getElementById('upload-modal').classList.remove('open'); }
+document.getElementById('upload-modal').addEventListener('click', function(e){ if(e.target===this) closeUploadModal(); });
+
+var dz = document.getElementById('modal-drop-zone');
+dz.addEventListener('dragover', function(e){ e.preventDefault(); this.classList.add('dragover'); });
+dz.addEventListener('dragleave', function(){ this.classList.remove('dragover'); });
+dz.addEventListener('drop', function(e){ e.preventDefault(); this.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+document.getElementById('upload-file-input').addEventListener('change', function(e){ handleFiles(e.target.files); });
+
+// 素材URL反映用の一時データ
+var pendingMaterialData = null; // { monthKey, sundayRows: [{no, dateStr, sourceUrl}] }
+
+function handleFiles(files) {
+  Array.from(files).forEach(function(f) {
+    if (!f.name.endsWith('.csv')) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var rows = processCSV(e.target.result);
+      if (!rows||!rows.length) return;
+      var key = detectMonthKey(rows);
+      if (!key) return;
+      var parts = key.split('-');
+      var label = parts[0]+'年'+parseInt(parts[1])+'月';
+
+      // 既存月のデータがある場合 → 素材URL反映モードを提案
+      if (months[key]) {
+        // CSVから素材URL①がある日曜日の行を抽出
+        var sundayRows = rows.filter(function(r){
+          return r.weekday === '日' && r.materialUrl1;
+        });
+        if (sundayRows.length > 0) {
+          openMaterialModal(key, sundayRows);
+          return;
+        }
+      }
+
+      addMonth(rows, key, label);
+    };
+    reader.readAsText(f, 'UTF-8');
+  });
+  closeUploadModal();
+}
+
+function openMaterialDirectModal() {
+  // 月が読み込まれていない場合
+  if (!activeMonth || !months[activeMonth]) {
+    alert('先にCSVを読み込んでください');
+    return;
+  }
+  // 表示中の月の日曜日リストを空のURLで開く
+  openMaterialModal(activeMonth, []);
+  // タイトルを変更
+  var h3 = document.querySelector('.material-box h3');
+  if (h3) h3.innerHTML = '&#128206; 素材URL①を反映（' + months[activeMonth].label + '）';
+  var sub = document.querySelector('.material-box .sub');
+  if (sub) sub.textContent = 'ギガファイル便などのURLを貼り付けて反映したい日曜日に入力してください。空欄の日は変更しません。';
+}
+
+function openMaterialModal(key, sundayRows) {
+  pendingMaterialData = { monthKey: key, sundayRows: sundayRows };
+  var existing = months[key];
+  var list = document.getElementById('sunday-list');
+
+  // 既存の日曜日リストを取得
+  var existingSundays = existing.rows.filter(function(r){ return r.weekday === '日'; });
+
+  list.innerHTML = existingSundays.map(function(row, idx) {
+    var dateDisp = row.date ? row.date.toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'}) : row.dateStr;
+    // CSVから対応するURLを探す（順番で対応 or No一致）
+    var sourceRow = sundayRows[idx] || null;
+    var sourceUrl = sourceRow ? sourceRow.materialUrl1 : '';
+    var currentUrl = row.materialUrl1 || '';
+    return '<div class="sunday-item" id="sitem-'+row.no+'">' +
+      '<div class="sunday-date">'+dateDisp+'</div>' +
+      '<input class="sunday-url-input" type="text" id="surl-'+row.no+'" placeholder="素材URL①（空欄=反映しない）" value="'+sourceUrl+'">' +
+      (currentUrl ? '<div class="sunday-current">現在: '+currentUrl+'</div>' : '<div class="sunday-current" style="color:var(--text-dim)">現在: 未設定</div>') +
+      (sourceUrl ? '<div class="sunday-source">CSVから: '+sourceUrl.slice(0,60)+(sourceUrl.length>60?'…':'')+'</div>' : '') +
+    '</div>';
+  }).join('');
+
+  document.getElementById('material-modal').classList.add('open');
+}
+
+function closeMaterialModal() {
+  document.getElementById('material-modal').classList.remove('open');
+  pendingMaterialData = null;
+}
+
+function applyMaterialUrls() {
+  if (!pendingMaterialData) return;
+  var key = pendingMaterialData.monthKey;
+  var existing = months[key];
+  var sundays = existing.rows.filter(function(r){ return r.weekday === '日'; });
+  var updated = 0;
+
+  sundays.forEach(function(row) {
+    var input = document.getElementById('surl-'+row.no);
+    if (!input) return;
+    var newUrl = input.value.trim();
+    if (newUrl && newUrl !== row.materialUrl1) {
+      row.materialUrl1 = newUrl;
+      updated++;
+    }
+  });
+
+  closeMaterialModal();
+  renderTabs();
+  renderDashboard(key);
+
+  // フィードバックトースト
+  showToast(updated + '件の日曜日に素材URL①を反映しました ✓');
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--accent3);color:#000;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(function(){ t.style.opacity = '0'; }, 2800);
+}
+
+function resetToWelcome() {
+  
+  months = {}; activeMonth = null; filters = {}; searches = {};
+  document.getElementById("dashboards-container").innerHTML = "";
+  document.getElementById("month-tabs-bar").style.display = "none";
+  document.getElementById("welcome-screen").style.display = "";
+}
+
+var SHEET_URLS = [
+  { key:'2026-03', label:'2026年3月', url:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTiXK04o9Zv9OnUO5jYZ6wsc5C6UzJGeafQgDXUeVT4l7iaJ7kM6-lf_o5dc5mQJmU-tXZ_p7Edodpc/pub?gid=243823405&single=true&output=csv' },
+  { key:'2026-04', label:'2026年4月', url:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTiXK04o9Zv9OnUO5jYZ6wsc5C6UzJGeafQgDXUeVT4l7iaJ7kM6-lf_o5dc5mQJmU-tXZ_p7Edodpc/pub?gid=26868912&single=true&output=csv' },
+  { key:'2026-05', label:'2026年5月', url:'https://docs.google.com/spreadsheets/d/e/2PACX-1vTiXK04o9Zv9OnUO5jYZ6wsc5C6UzJGeafQgDXUeVT4l7iaJ7kM6-lf_o5dc5mQJmU-tXZ_p7Edodpc/pub?gid=1696408381&single=true&output=csv' },
+];
+
+function loadBuiltinData() {
+  document.getElementById('welcome-screen').innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-muted);font-size:14px;">&#9654; スプレッドシートから読み込み中...</div>';
+
+  var loaded = 0, failed = 0, total = SHEET_URLS.length;
+
+  SHEET_URLS.forEach(function(d) {
+    var timeout = new Promise(function(_, reject) {
+      setTimeout(function(){ reject(new Error('timeout')); }, 4000);
+    });
+    Promise.race([fetch(d.url), timeout])
+      .then(function(res) { if (!res.ok) throw new Error(); return res.text(); })
+      .then(function(text) {
+        var rows = processCSV(text);
+        if (rows) addMonth(rows, d.key, d.label);
+        loaded++; checkDone();
+      })
+      .catch(function() {
+        var fallback = {'2026-03':CSV_MAR,'2026-04':CSV_APR,'2026-05':CSV_MAY}[d.key];
+        if (fallback) { var rows = processCSV(fallback); if (rows) addMonth(rows, d.key, d.label); }
+        failed++; checkDone();
+      });
+  });
+
+  function checkDone() {
+    if (loaded + failed < total) return;
+    document.getElementById('welcome-screen').style.display = 'none';
+    document.getElementById('month-tabs-bar').style.display = '';
+    var todayKey = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0');
+    if (months[todayKey]) setActiveMonth(todayKey);
+    else setActiveMonth('2026-03');
+    if (failed > 0) showToast('⚠ ' + failed + '件はオフラインのため埋め込みデータを使用しました');
+    else showToast('✓ スプレッドシートから最新データを読み込みました');
+  }
+}
+
+// <<AUTO_UPDATE_MAR_START>>
+var CSV_MAR = 'No,投稿予定日,投稿日変更,曜日,動画 確認,サムネ 確認,動画 担当,サムネ担当,動画タイトル,編集者さんへ 共有事項,予約投稿したか,動画納品URL (ギガファイル便),校正依頼動画URL (YouTube限定公開),素材URL①,素材URL②,サムネ納品URL (ギガファイル便),サムネ画像,サムネ画像案,YouTubeリンク\n' +
+'29,2026/3/1,,日,校正済み,校正済み,楠間さん,さきさん,【初登場】Amazon物販で月700万稼ぐ3児のパパ永田さん【せどり】【副業】【Amazon】,,TRUE,https://116.gigafile.nu/0513-f2d5f91846d331000bbfb4457625f245f,https://youtu.be/-BWe_Wi4tkU,https://54.gigafile.nu/0505-decb24b89489f4f870dcfbc651db9e19,,https://68.gigafile.nu/0514-b18762715a524b0f33735fb626d183ffd,,,\n' +
+'2,2026/3/2,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'3,2026/3/3,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'4,2026/3/4,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'5,2026/3/5,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'6,2026/3/6,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'7,2026/3/7,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'8,2026/3/8,2026/3/29,日,校正済み,校正済み,中原さん,さきさん,【大活躍中】SNSで2億売り上げるSNSのプロいそっちさん！,,TRUE,https://119.gigafile.nu/0601-gd29905f01d0605833e0896dcac0654e3,https://youtu.be/Fwnymn2V1VY,https://88.gigafile.nu/0507-c7e78651c8f01e9c43317f0a4dac2240,,https://90.gigafile.nu/0511-c066a9d70a92691c967ba7b4337211466,,,\n' +
+'9,2026/3/9,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'10,2026/3/10,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'11,2026/3/11,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'12,2026/3/12,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'13,2026/3/13,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'14,2026/3/14,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'15,2026/3/15,2026/4/5,日,校正済み,確認依頼,楠間さん,さきさん,【久々登場】こはく君の100円コンテンツ販売します！,,FALSE,https://77.gigafile.nu/0518-p83c021dfb634d673b35dbc776f5e861c,https://youtu.be/VlaEVII7lWw,https://10.gigafile.nu/0509-0b9247ba4a4397f1c73bbc7e1573a986,,https://82.gigafile.nu/0604-c1b8e65c8d91ce5d358fcc09947501f6f,,,\n' +
+'16,2026/3/16,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'17,2026/3/17,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'18,2026/3/18,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'19,2026/3/19,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'20,2026/3/20,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'21,2026/3/21,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'22,2026/3/22,2026/5/10,日,空白,校正済み,中原さん,さきさん,【ONE史上最速】初月100万円利益を達成した53歳主婦の美奈子さん！,,FALSE,,,https://18.gigafile.nu/0513-ef70ee5833445d3e8eae7e0c7201f703,,https://69.gigafile.nu/0520-bf8a934874fe25f45c065a09f265e884c,,,\n' +
+'23,2026/3/23,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'24,2026/3/24,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'25,2026/3/25,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'26,2026/3/26,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'27,2026/3/27,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'28,2026/3/28,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'29,2026/3/29,2026/4/12,日,校正済み,校正済み,楠間さん,さきさん,【初登場】開始8ヶ月で200万！アパレル講師の堤さん！【せどり】【副業】【アパレル】【メルカリ】,5:06~以下の画像を画面に表示お願いします！ / 5:24~7:25カット,FALSE,https://37.gigafile.nu/0529-gf5dc01234a9fcb2d66a246e92cff1c8c,https://youtu.be/woAJmh97cKI,https://11.gigafile.nu/0515-d2f26722f11545e351ae676c3bbce986,,https://69.gigafile.nu/0520-cc3c58758eb41bbfef85db25bf2fab557,,,\n' +
+'30,2026/3/30,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'31,2026/3/31,,火,空白,空白,,,,,FALSE,,,,,,,,';
+// <<AUTO_UPDATE_MAR_END>>
+
+// <<AUTO_UPDATE_APR_START>>
+var CSV_APR = 'No,投稿予定日,投稿日変更,曜日,動画 確認,サムネ 確認,動画 担当,サムネ担当,動画タイトル,編集者さんへ 共有事項,予約投稿したか,動画納品URL (ギガファイル便),校正依頼動画URL (YouTube限定公開),素材URL①,素材URL②,サムネ納品URL (ギガファイル便),サムネ画像,サムネ画像案,YouTubeリンク\n' +
+'1,2026/4/1,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'2,2026/4/2,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'3,2026/4/3,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'4,2026/4/4,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'5,2026/4/5,2026/4/19,日,空白,校正済み,中原さん,さきさん,【大復活】借金500万から月300万を達成！！eBay講師尾形さん,尾形さんの画像: https://21.gigafile.nu/0523-d89441e0cccd3e08f376b71b147242e05,FALSE,,,https://116.gigafile.nu/0522-a5c766ee64f0543d9abbac7b63c0c5dc,,https://40.gigafile.nu/0528-ce1aaa41b2c372151df9ad0dea291053a,,,\n' +
+'6,2026/4/6,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'7,2026/4/7,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'8,2026/4/8,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'9,2026/4/9,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'10,2026/4/10,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'11,2026/4/11,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'12,2026/4/12,2026/3/8,日,空白,校正済み,楠間さん,さきさん,【初登場】副業で月利300万達成!?AIONE講師の小高さん！その驚愕の手法とは？,00:18~00:30カット / 00:40~00:58カット,FALSE,,,https://116.gigafile.nu/0522-8ad6d956250f98bf297e08904b1d2aa7,,https://40.gigafile.nu/0528-d97061d82dea6d20660c55b0070803123,,,\n' +
+'13,2026/4/13,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'14,2026/4/14,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'15,2026/4/15,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'16,2026/4/16,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'17,2026/4/17,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'18,2026/4/18,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'19,2026/4/19,2026/3/15,日,空白,校正済み,中原さん,さきさん,【元スキージャンパー】AIONE受講生1000人越え！動画編集からChatGPTマスターへ登り詰めたAI ONE講師伊藤さん,,FALSE,,,https://109.gigafile.nu/0524-f2a2cc1c5500844dbbeac7586123ef7f,,https://3.gigafile.nu/0528-baf609aeb1c50d0f26802979009167111,,,\n' +
+'20,2026/4/20,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'21,2026/4/21,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'22,2026/4/22,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'23,2026/4/23,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'24,2026/4/24,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'25,2026/4/25,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'26,2026/4/26,2026/4/26,日,空白,確認依頼,中原さん,さきさん,【初登場】借金200万から年収3000万！年商10億まで登り上げたONEの最強の右腕となった晴菜さん,①06:10~06:55カット ②11:10~11:11ピー ③11:11~11:13ピー音 ④11:53~12:15カット,FALSE,,,https://39.gigafile.nu/0528-db6f345f8fe01b3efbc9bd07f5686b8b,,https://4.gigafile.nu/0604-ce907f40fcd568570333f14a0d87ed10b,,,\n' +
+'27,2026/4/27,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'28,2026/4/28,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'29,2026/4/29,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'30,2026/4/30,,木,空白,空白,,,,,FALSE,,,,,,,,';
+// <<AUTO_UPDATE_APR_END>>
+
+// <<AUTO_UPDATE_MAY_START>>
+var CSV_MAY = 'No,投稿予定日,投稿日変更,曜日,動画 確認,サムネ 確認,動画 担当,サムネ担当,動画タイトル,編集者さんへ 共有事項,予約投稿したか,動画納品URL (ギガファイル便),校正依頼動画URL (YouTube限定公開),素材URL①,素材URL②,サムネ納品URL (ギガファイル便),サムネ画像,サムネ画像案,YouTubeリンク\n' +
+'1,2026/5/1,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'2,2026/5/2,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'3,2026/5/3,,日,空白,確認依頼,楠間さん,さきさん,未経験から月利350万円達成した！元会社員の櫻岡さん,,FALSE,,,https://38.gigafile.nu/0601-95ef867b34b53ce78096ec692fe87276,,https://121.gigafile.nu/0607-d0b18ae2750452d534559ded097e4b39a,,,\n' +
+'4,2026/5/4,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'5,2026/5/5,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'6,2026/5/6,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'7,2026/5/7,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'8,2026/5/8,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'9,2026/5/9,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'10,2026/5/10,2026/3/22,日,空白,空白,中原さん,さきさん,借金500万から1年で月利130万達成した！Amazon部門けんたろうさん,,FALSE,,,https://38.gigafile.nu/0607-6989c7d8e3b7ac7870d824c76b11fbe8,,,,\n' +
+'11,2026/5/11,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'12,2026/5/12,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'13,2026/5/13,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'14,2026/5/14,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'15,2026/5/15,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'16,2026/5/16,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'17,2026/5/17,,日,空白,空白,楠間さん,さきさん,,,FALSE,,,,,,,,\n' +
+'18,2026/5/18,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'19,2026/5/19,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'20,2026/5/20,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'21,2026/5/21,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'22,2026/5/22,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'23,2026/5/23,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'24,2026/5/24,,日,空白,空白,中原さん,さきさん,,,FALSE,,,,,,,,\n' +
+'25,2026/5/25,,月,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'26,2026/5/26,,火,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'27,2026/5/27,,水,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'28,2026/5/28,,木,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'29,2026/5/29,,金,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'30,2026/5/30,,土,空白,空白,,,,,FALSE,,,,,,,,\n' +
+'31,2026/5/31,,日,空白,空白,楠間さん,さきさん,,,FALSE,,,,,,,,';
+// <<AUTO_UPDATE_MAY_END>>
+</script>
+</body>
+</html>
