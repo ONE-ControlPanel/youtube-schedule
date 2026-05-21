@@ -451,18 +451,37 @@ today.setHours(0,0,0,0);
 document.getElementById('today-display').textContent = today.toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'});
 
 function parseCSVText(text) {
-  var lines = text.split(/\r?\n/);
-  return lines.map(function(line) {
-    var cols = [], cur = '', inQ = false;
-    for (var i = 0; i < line.length; i++) {
-      var c = line[i];
-      if (c === '"') { inQ = !inQ; }
-      else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-      else { cur += c; }
+  var rows = [];
+  var cur = '';
+  var row = [];
+  var inQ = false;
+  for (var i = 0; i < text.length; i++) {
+    var c = text[i];
+    if (c === '"') {
+      if (inQ && text[i+1] === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQ = !inQ;
+      }
+    } else if (c === ',' && !inQ) {
+      row.push(cur);
+      cur = '';
+    } else if ((c === '\n' || c === '\r') && !inQ) {
+      if (c === '\r' && text[i+1] === '\n') i++;
+      row.push(cur);
+      rows.push(row);
+      row = [];
+      cur = '';
+    } else {
+      cur += c;
     }
-    cols.push(cur.trim());
-    return cols;
-  });
+  }
+  if (cur.length > 0 || row.length > 0) {
+    row.push(cur);
+    rows.push(row);
+  }
+  return rows;
 }
 
 function getField(obj, keys) {
