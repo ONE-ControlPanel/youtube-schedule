@@ -300,12 +300,13 @@
           if(window.__fbAutoEditHooked) return;
           window.__fbAutoEditHooked = true;
           var orig = window.showDetail;
-          window.showDetail = function(key){
-                  orig(key);
+          window.showDetail = function(){
+                  var ret = orig.apply(this, arguments);
                   setTimeout(function(){
                             var btn = document.getElementById('fb-edit-toggle');
                             if(btn && !btn.classList.contains('editing')){ btn.click(); }
                   }, 250);
+                  return ret;
           };
     }
     hookAutoEdit();
