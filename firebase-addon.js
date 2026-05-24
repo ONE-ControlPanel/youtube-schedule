@@ -291,3 +291,22 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             })();
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+
+
+// ===== Step1: auto-open edit panel when detail modal opens =====
+(function(){
+    function hookAutoEdit(){
+          if(typeof window.showDetail !== 'function'){ setTimeout(hookAutoEdit, 500); return; }
+          if(window.__fbAutoEditHooked) return;
+          window.__fbAutoEditHooked = true;
+          var orig = window.showDetail;
+          window.showDetail = function(key){
+                  orig(key);
+                  setTimeout(function(){
+                            var btn = document.getElementById('fb-edit-toggle');
+                            if(btn && !btn.classList.contains('editing')){ btn.click(); }
+                  }, 250);
+          };
+    }
+    hookAutoEdit();
+})();
