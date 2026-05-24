@@ -294,20 +294,115 @@
 
 
 // ===== Step1: auto-open edit panel when detail modal opens =====
+// ===== Step1-Ext: full inline edit + checkbox fix =====
 (function(){
-    function hookAutoEdit(){
-          if(typeof window.showDetail !== 'function'){ setTimeout(hookAutoEdit, 500); return; }
-          if(window.__fbAutoEditHooked) return;
-          window.__fbAutoEditHooked = true;
-          var orig = window.showDetail;
-          window.showDetail = function(){
-                  var ret = orig.apply(this, arguments);
-                  setTimeout(function(){
-                            var btn = document.getElementById('fb-edit-toggle');
-                            if(btn && !btn.classList.contains('editing')){ btn.click(); }
-                  }, 250);
-                  return ret;
-          };
+  var ADDED = [
+    {key:'thumbStaff', label:'サムネ担当', type:'select', opts:['','さきさん']},
+    {key:'deliveryUrl', label:'動画納品URL', type:'text'},
+    {key:'reviewUrl', label:'校正依頼URL', type:'text'},
+    {key:'materialUrl1', label:'素材URL①', type:'text'},
+    {key:'materialUrl2', label:'素材URL②', type:'text'},
+    {key:'thumbUrl', label:'サムネ納品URL', type:'text'},
+    {key:'thumbIdea', label:'サムネ画像案', type:'textarea'},
+    {key:'youtubeLink', label:'YouTubeリンク', type:'text'}
+  ];
+  var curKey=null, curNo=null;
+  function getRow(){
+    if(!curKey||!curNo) return null;
+    var m=window.months&&window.months[curKey]; if(!m||!m.rows) return null;
+    return m.rows.find(function(r){return r.no==curNo;});
+  }
+  function inject(){
+    var p=document.getElementById('fb-edit-panel');
+    if(!p||p.dataset.fbExt==='1') return;
+    var row=getRow(); if(!row) return;
+    p.dataset.fbExt='1';
+    var save=document.getElementById('fb-save-btn');
+    ADDED.forEach(function(f){
+      var d=document.createElement('div'); d.className='fb-edit-row';
+      var lb=document.createElement('label'); lb.textContent=f.label; d.appendChild(lb);
+      var i;
+      if(f.type==='textarea'){ i=document.createElement('textarea'); i.value=row[f.key]||''; }
+      else if(f.type==='select'){
+        i=document.createElement('select');
+        f.opts.forEach(function(o){ var op=document.createElement('option'); op.value=o; op.textContent=o||'（未設定）'; if((row[f.key]||'')===o) op.selected=true; i.appendChild(op); });
+      } else { i=document.createElement('input'); i.type='text'; i.value=row[f.key]||''; }
+      i.id='fb-edit-ext-'+f.key;
+      d.appendChild(i); p.insertBefore(d,save);
+    });
+  }
+  function hookShowDetail(){
+    if(typeof window.showDetail!=='function'){ setTimeout(hookShowDetail,500); return; }
+    if(window.__fbExtHooked) return; window.__fbExtHooked=true;
+    var orig=window.showDetail;
+    window.showDetail=function(key,no){
+      curKey=key; curNo=no;
+      var ret=orig.apply(this,arguments);
+      setTimeout(function(){
+        var b=document.getElementById('fb-edit-toggle');
+        if(b&&!b.classList.contains('editing')) b.click();
+        setTimeout(inject,80);
+        setTimeout(fixChecks,120);
+      },200);
+      return ret;
+    };
+  }
+  document.addEventListener('click',function(e){
+    if(e.target&&e.target.id==='fb-edit-toggle'){
+      setTimeout(function(){
+        var b=document.getElementById('fb-edit-toggle');
+        if(b&&b.classList.contains('editing')) inject();
+      },80);
     }
-    hookAutoEdit();
+  },false);
+  document.addEventListener('click',function(e){
+    if(!(e.target&&e.target.id==='fb-save-btn')) return;
+    if(!curKey||!curNo) return;
+    e.stopImmediatePropagation(); e.preventDefault();
+    var btn=e.target; btn.disabled=true; btn.textContent='保存中...';
+    var d=document.getElementById('fb-edit-date').value;
+    var t=document.getElementById('fb-edit-title').value;
+    var s=document.getElementById('fb-edit-staff').value;
+    var n=document.getElementById('fb-edit-note');
+    var patch={title:t, videoStaff:s};
+    if(n) patch.notes=n.value;
+    if(d){ var dp=d.split('-'); patch.dateStr=dp[0]+'/'+parseInt(dp[1])+'/'+parseInt(dp[2]); }
+    ADDED.forEach(function(f){
+      var el=document.getElementById('fb-edit-ext-'+f.key);
+      if(el) patch[f.key]=el.value;
+    });
+    var id=curKey+'_'+curNo;
+    var fb=window.firebase; var u=fb.auth().currentUser;
+    var merged=Object.assign({},patch,{updatedAt:fb.firestore.FieldValue.serverTimestamp(),updatedBy:(u&&u.email)||'unknown'});
+    fb.firestore().collection('edits').doc(id).set(merged,{merge:true}).then(function(){
+      btn.textContent='✓ 保存しました';
+      setTimeout(function(){ window.showDetail(curKey,curNo); },700);
+    }).catch(function(err){ btn.disabled=false; btn.textContent='💾 保存'; alert('保存失敗: '+err.message); });
+  },true);
+  var CHECK_MAP=[{label:'動画確認',field:'videoCheck'},{label:'サムネ確認',field:'thumbCheck'},{label:'予約投稿',field:'_markedPosted'}];
+  function fixChecks(){
+    if(!curKey||!curNo) return;
+    var items=document.querySelectorAll('#modal-content .check-item, #modal-body .check-item');
+    items.forEach(function(it){
+      if(it.dataset.fbFixed==='1') return;
+      var lb=it.querySelector('.check-label'); if(!lb) return;
+      var raw=lb.textContent.trim().replace(/^[✓●○ ]+/,'').replace('予約投稿解除','予約投稿');
+      var m=CHECK_MAP.find(function(c){return raw===c.label;});
+      if(!m) return;
+      it.dataset.fbFixed='1';
+      it.onclick=function(ev){
+        ev&&ev.stopPropagation();
+        try{ window.toggleCheck(curKey,curNo,m.field); }catch(e){}
+        var row=getRow(); if(!row) return;
+        var fb=window.firebase; var u=fb.auth().currentUser; var id=curKey+'_'+curNo;
+        var patch={};
+        if(m.field==='_markedPosted') patch.reserved=row.reserved;
+        else patch[m.field]=row[m.field];
+        patch.updatedAt=fb.firestore.FieldValue.serverTimestamp();
+        patch.updatedBy=(u&&u.email)||'unknown';
+        fb.firestore().collection('edits').doc(id).set(patch,{merge:true}).catch(function(e){ console.error('check save failed',e); });
+      };
+    });
+  }
+  hookShowDetail();
 })();
