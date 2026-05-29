@@ -406,3 +406,18 @@
   }
   hookShowDetail();
 })();
+
+// ===== Avatar fix: show login user email first char =====
+(function(){
+  function updateAvatar(){
+    var a=document.getElementById('fb-avatar');
+    var u=window.firebase&&window.firebase.auth&&window.firebase.auth().currentUser;
+    if(a&&u&&u.email){ a.textContent=u.email.charAt(0).toUpperCase(); }
+  }
+  function watch(){
+    if(typeof window.firebase==='undefined'||!window.firebase.auth){ setTimeout(watch,500); return; }
+    window.firebase.auth().onAuthStateChanged(function(){ setTimeout(updateAvatar,50); });
+    setInterval(updateAvatar,2000);
+  }
+  watch();
+})();
