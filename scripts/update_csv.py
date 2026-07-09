@@ -70,7 +70,8 @@ def update_html(html: str, marker: str, var_name: str, csv_text: str) -> str:
     new_js = csv_to_js(csv_text, var_name)
     replacement = f"{start_tag}\n{new_js}\n{end_tag}"
 
-    updated, count = pattern.subn(replacement, html)
+    # 置換文字列を関数で渡す（文字列で渡すと \n 等がエスケープ解釈されJSが壊れる）
+    updated, count = pattern.subn(lambda _: replacement, html)
     if count == 0:
         print(f"  ERROR: マーカーが見つかりません: {start_tag}", file=sys.stderr)
         return html
