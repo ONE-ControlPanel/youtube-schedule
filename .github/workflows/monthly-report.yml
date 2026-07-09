@@ -28,6 +28,11 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: サマリー画像の生成に必要なライブラリをインストール
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk
+          pip install --quiet matplotlib pillow
+
       - name: 月間レポートを生成してChatWorkへ送信
         env:
           CHATWORK_API_TOKEN: ${{ secrets.CHATWORK_API_TOKEN }}

@@ -135,7 +135,7 @@ def fmt_min_sec(seconds: int) -> str:
     return f"{seconds // 60} 分 {seconds % 60} 秒"
 
 
-def build_report(data: dict, month: str) -> str:
+def build_report(data: dict, month: str, an: dict | None) -> str:
     start, end = month_range(month)
     history = data.get("history", [])
     channel = data.get("channel", {})
@@ -147,7 +147,6 @@ def build_report(data: dict, month: str) -> str:
     has_delta = snap_start and snap_end and snap_start["date"] < snap_end["date"]
 
     NA = "―"
-    an = fetch_yt_analytics(month)  # OAuth設定済みならStudio相当の指標を取得
     watch_time = fmt_hours(an["watchMinutes"]) if an else NA
     avg_view = fmt_min_sec(an["avgViewSec"]) if an else NA
     retention = f"{an['avgViewPct']:.1f} %" if an else NA
@@ -221,6 +220,35 @@ def post_to_chatwork(message: str):
         print(f"ChatWork 送信完了: HTTP {resp.status} / room {room}")
 
 
+def upload_image_to_chatwork(path: str):
+    """サマリー画像をChatWorkのファイルとして同じルームに添付する。"""
+    import uuid
+    token = os.environ["CHATWORK_API_TOKEN"]
+    room = os.environ.get("CHATWORK_ROOM_ID") or DEFAULT_ROOM_ID
+    with open(path, "rb") as f:
+        img = f.read()
+
+    boundary = "----cw" + uuid.uuid4().hex
+    filename = os.path.basename(path)
+    body = b""
+    body += f"--{boundary}\r\n".encode()
+    body += f'Content-Disposition: form-data; name="file"; filename="{filename}"\r\n'.encode()
+    body += b"Content-Type: image/png\r\n\r\n"
+    body += img + b"\r\n"
+    body += f"--{boundary}--\r\n".encode()
+
+    req = urllib.request.Request(
+        f"https://api.chatwork.com/v2/rooms/{room}/files",
+        data=body, method="POST",
+        headers={
+            "X-ChatWorkToken": token,
+            "Content-Type": f"multipart/form-data; boundary={boundary}",
+            "User-Agent": "Mozilla/5.0",
+        })
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        print(f"ChatWork 画像添付完了: HTTP {resp.status}")
+
+
 def main():
     if not os.environ.get("CHATWORK_API_TOKEN"):
         print("CHATWORK_API_TOKEN が未設定のためスキップします。")
@@ -239,11 +267,21 @@ def main():
         prev = first_of_this_month - timedelta(days=1)
         month = prev.strftime("%Y-%m")
 
-    message = build_report(data, month)
+    an = fetch_yt_analytics(month)  # OAuth設定済みならStudio相当の指標を取得
+    message = build_report(data, month, an)
     print("---- 送信内容 ----")
     print(message)
     print("------------------")
     post_to_chatwork(message)
+
+    # サマリー画像を生成して添付（matplotlib等が無い環境ではスキップ）
+    try:
+        import report_image
+        img_path = f"monthly_report_{month}.png"
+        report_image.generate(data, month, an, img_path)
+        upload_image_to_chatwork(img_path)
+    except Exception as e:
+        print(f"WARNING: サマリー画像はスキップしました: {e}", file=sys.stderr)
 
 
 if __name__ == "__main__":
