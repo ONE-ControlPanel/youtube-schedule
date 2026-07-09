@@ -44,5 +44,6 @@ jobs:
             echo "変更なし - スキップ"
           else
             git commit -m "chore: スケジュールCSVとアナリティクスデータを自動更新"
+            git pull --rebase origin main
             git push
           fi
