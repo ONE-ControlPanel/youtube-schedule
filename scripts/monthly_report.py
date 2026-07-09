@@ -67,18 +67,17 @@ def build_report(data: dict, month: str) -> str:
 
     NA = "―"
     lines = [
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━",
         "",
-        "📊 エンゲージメント",
+        "📊エンゲージメント",
         f"・▶️ 総再生回数：{views_line}",
         f"・⏱️ 総再生時間：{NA}",
         f"・🕒 平均視聴時間：{NA}",
         f"・📉 視聴維持率：{NA}",
         "",
-        "🌍 オーディエンス",
-        f"・👥 現在のチャンネル登録者数：{subs_now}",
-        f"・📈 チャンネル登録者数の純増減：{subs_delta}",
-        f"・👤 ユニーク視聴者数：{NA}",
+        "🌍オーディエンス",
+        f"・👥現在のチャンネル登録者数：{subs_now}",
+        f"・📈チャンネル登録者数の純増減：{subs_delta}",
+        f"・👤ユニーク視聴者数：{NA}",
         "",
         f"※「{NA}」の項目はチャンネル所有者のYouTube Studio連携が必要なため未取得です",
         "",
@@ -96,6 +95,7 @@ def build_report(data: dict, month: str) -> str:
             lines.append(f"{medal}：{title}（{v['views']:,}回）")
             if medal.endswith("1位"):
                 lines.append(f"🔗 リンク：https://youtu.be/{v['id']}")
+                lines.append("")
     else:
         lines.append(f"{label}に公開された動画はありませんでした")
 
@@ -104,7 +104,7 @@ def build_report(data: dict, month: str) -> str:
     lines.append("https://one-controlpanel.github.io/youtube-schedule/")
 
     body = "\n".join(lines)
-    title = f"▶️ 月間YouTubeアナリティクスレポート（{label}）"
+    title = f"▶️ 月間YouTubeのアナリティクスレポート（{label}）"
     return f"[info][title]{title}[/title]{body}[/info]"
 
 
