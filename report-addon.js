@@ -4,7 +4,7 @@
 // 未設定の間はテキストをコピーしてChatWorkを開く（貼り付け方式）。
 ;(function(){
   // GAS中継サーバーのURL（デプロイ後にここへ貼る）
-  var GAS_WEBHOOK_URL = '';
+  var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxwAGzj3rHMJGDdHB8PB5eK8yi9c6riZJ2lVun-4jHsZNBjHQHWFx-5Ei5eP5hOMwHqmQ/exec';
   var CW_ROOM_ID = '288597442';  // コピー方式のとき開くルーム
 
   function toast(msg){
