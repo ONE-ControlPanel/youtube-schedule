@@ -91,13 +91,15 @@ def main():
         print(json.dumps(tokens, indent=2))
         return
 
-    print("\n✅ 取得成功！以下の3つをGitHub Secretsに登録してください（値は他人に見せないこと）:\n")
-    print("gh secret set YT_OAUTH_CLIENT_ID -R ONE-ControlPanel/youtube-schedule")
-    print(f"  → {client_id}")
-    print("gh secret set YT_OAUTH_CLIENT_SECRET -R ONE-ControlPanel/youtube-schedule")
-    print("  → （入力したクライアントシークレット）")
-    print("gh secret set YT_OAUTH_REFRESH_TOKEN -R ONE-ControlPanel/youtube-schedule")
-    print(f"  → {refresh}")
+    # コピペ切れを防ぐため、トークンはファイル経由で登録する
+    import os
+    token_path = os.path.expanduser("~/yt_refresh_token.txt")
+    with open(token_path, "w") as f:
+        f.write(refresh)
+
+    print("\n✅ 取得成功！トークンを ~/yt_refresh_token.txt に保存しました。")
+    print("次のコマンドを【1行そのまま】コピーして実行すれば登録完了です（登録後ファイルは自動削除されます）:\n")
+    print("gh secret set YT_OAUTH_REFRESH_TOKEN -R ONE-ControlPanel/youtube-schedule < ~/yt_refresh_token.txt && rm ~/yt_refresh_token.txt && echo 登録完了")
 
 
 if __name__ == "__main__":
