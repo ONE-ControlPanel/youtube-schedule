@@ -10,6 +10,11 @@ data/analytics.json の日次スナップショット履歴から前月分の増
   CHATWORK_API_TOKEN  - ChatWork API トークン
   CHATWORK_ROOM_ID    - 送信先ルームID（省略時は 399892175）
   REPORT_MONTH        - 任意。"2026-06" 形式で対象月を指定（省略時は前月）
+
+任意（設定すると総再生時間・平均視聴時間・視聴維持率・正確な純増減が取得できる）:
+  YT_OAUTH_CLIENT_ID / YT_OAUTH_CLIENT_SECRET / YT_OAUTH_REFRESH_TOKEN
+    - YouTube Analytics API のOAuth認証情報（scripts/get_refresh_token.py で取得）
+  YOUTUBE_CHANNEL_ID  - 対象チャンネルID
 """
 import json
 import os
@@ -44,6 +49,74 @@ def fmt_delta(n: int) -> str:
     return f"+{n:,}" if n >= 0 else f"{n:,}"
 
 
+def fetch_yt_analytics(month: str):
+    """YouTube Analytics API から対象月の非公開指標を取得する。
+    OAuth用のSecretsが未設定なら None を返す（公開データのみのレポートになる）。"""
+    cid = os.environ.get("YT_OAUTH_CLIENT_ID", "").strip()
+    csec = os.environ.get("YT_OAUTH_CLIENT_SECRET", "").strip()
+    rtok = os.environ.get("YT_OAUTH_REFRESH_TOKEN", "").strip()
+    channel = os.environ.get("YOUTUBE_CHANNEL_ID", "").strip()
+    if not (cid and csec and rtok and channel):
+        return None
+
+    try:
+        # リフレッシュトークン → アクセストークン
+        payload = urllib.parse.urlencode({
+            "client_id": cid, "client_secret": csec,
+            "refresh_token": rtok, "grant_type": "refresh_token",
+        }).encode()
+        with urllib.request.urlopen("https://oauth2.googleapis.com/token", data=payload, timeout=20) as resp:
+            access_token = json.loads(resp.read().decode())["access_token"]
+
+        start, end = month_range(month)
+        end_day = (datetime.fromisoformat(end) - timedelta(days=1)).strftime("%Y-%m-%d")
+        params = urllib.parse.urlencode({
+            "ids": f"channel=={channel}",
+            "startDate": start,
+            "endDate": end_day,
+            "metrics": "views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,subscribersGained,subscribersLost",
+        })
+        req = urllib.request.Request(
+            f"https://youtubeanalytics.googleapis.com/v2/reports?{params}",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read().decode())
+        rows = data.get("rows") or []
+        if not rows:
+            print("WARNING: Analytics APIの結果が空でした（対象月にデータなし）", file=sys.stderr)
+            return None
+        cols = [c["name"] for c in data.get("columnHeaders", [])]
+        row = dict(zip(cols, rows[0]))
+        return {
+            "views": int(row.get("views", 0)),
+            "watchMinutes": int(row.get("estimatedMinutesWatched", 0)),
+            "avgViewSec": int(row.get("averageViewDuration", 0)),
+            "avgViewPct": float(row.get("averageViewPercentage", 0.0)),
+            "subsNet": int(row.get("subscribersGained", 0)) - int(row.get("subscribersLost", 0)),
+        }
+    except urllib.error.HTTPError as e:
+        try:
+            msg = json.loads(e.read().decode()).get("error", {}).get("message", "")
+        except Exception:
+            msg = ""
+        print(f"WARNING: Analytics API HTTP {e.code}: {msg} → 公開データのみでレポートします", file=sys.stderr)
+        return None
+    except Exception as e:
+        print(f"WARNING: Analytics API取得失敗: {e} → 公開データのみでレポートします", file=sys.stderr)
+        return None
+
+
+def fmt_hours(minutes: int) -> str:
+    if minutes >= 60:
+        return f"{minutes // 60:,} 時間 {minutes % 60} 分"
+    return f"{minutes} 分"
+
+
+def fmt_min_sec(seconds: int) -> str:
+    return f"{seconds // 60} 分 {seconds % 60} 秒"
+
+
 def build_report(data: dict, month: str) -> str:
     start, end = month_range(month)
     history = data.get("history", [])
@@ -55,34 +128,43 @@ def build_report(data: dict, month: str) -> str:
     snap_end = pick_snapshot(history, end, after=True) or (history[-1] if history else None)
     has_delta = snap_start and snap_end and snap_start["date"] < snap_end["date"]
 
-    if has_delta:
+    NA = "―"
+    an = fetch_yt_analytics(month)  # OAuth設定済みならStudio相当の指標を取得
+    watch_time = fmt_hours(an["watchMinutes"]) if an else NA
+    avg_view = fmt_min_sec(an["avgViewSec"]) if an else NA
+    retention = f"{an['avgViewPct']:.1f} %" if an else NA
+
+    if an:
+        views_line = f"{an['views']:,} 回（月間）"
+        subs_delta = f"{fmt_delta(an['subsNet'])} 人"
+    elif has_delta:
         views_line = f"{fmt_delta(snap_end['viewCount'] - snap_start['viewCount'])} 回（累計 {snap_end['viewCount']:,} 回）"
         subs_delta = f"{fmt_delta(snap_end['subscriberCount'] - snap_start['subscriberCount'])} 人"
-        subs_now = f"{snap_end['subscriberCount']:,} 人"
     else:
         # 履歴が1ヶ月分溜まっていない初回などは現在値のみ報告
         views_line = f"累計 {channel.get('viewCount', 0):,} 回（月間増加は翌月分から表示）"
         subs_delta = "―（計測開始月のため翌月分から表示）"
-        subs_now = f"{channel.get('subscriberCount', 0):,} 人"
 
-    NA = "―"
+    subs_now = f"{(snap_end or {}).get('subscriberCount', channel.get('subscriberCount', 0)):,} 人"
+
     lines = [
         "",
         "📊エンゲージメント",
         f"・▶️ 総再生回数：{views_line}",
-        f"・⏱️ 総再生時間：{NA}",
-        f"・🕒 平均視聴時間：{NA}",
-        f"・📉 視聴維持率：{NA}",
+        f"・⏱️ 総再生時間：{watch_time}",
+        f"・🕒 平均視聴時間：{avg_view}",
+        f"・📉 視聴維持率：{retention}",
         "",
         "🌍オーディエンス",
         f"・👥現在のチャンネル登録者数：{subs_now}",
         f"・📈チャンネル登録者数の純増減：{subs_delta}",
-        f"・👤ユニーク視聴者数：{NA}",
-        "",
-        f"※「{NA}」の項目はチャンネル所有者のYouTube Studio連携が必要なため未取得です",
-        "",
-        "🔴 月間上位コンテンツ",
+        f"・👤ユニーク視聴者数：{NA}（APIでは提供されない項目です）",
     ]
+    if not an:
+        lines.append("")
+        lines.append(f"※「{NA}」の項目はYouTube Studio連携（OAuth設定）後に表示されます")
+    lines.append("")
+    lines.append("🔴 月間上位コンテンツ")
 
     # 対象月に公開された動画の上位4本（再生数順）
     published = [v for v in data.get("videos", [])

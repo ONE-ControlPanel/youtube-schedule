@@ -33,4 +33,9 @@ jobs:
           CHATWORK_API_TOKEN: ${{ secrets.CHATWORK_API_TOKEN }}
           CHATWORK_ROOM_ID: ${{ secrets.CHATWORK_ROOM_ID }}
           REPORT_MONTH: ${{ github.event.inputs.report_month }}
+          # YouTube Studio連携（OAuth）- 未設定でも公開データのみで動作する
+          YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
+          YT_OAUTH_CLIENT_ID: ${{ secrets.YT_OAUTH_CLIENT_ID }}
+          YT_OAUTH_CLIENT_SECRET: ${{ secrets.YT_OAUTH_CLIENT_SECRET }}
+          YT_OAUTH_REFRESH_TOKEN: ${{ secrets.YT_OAUTH_REFRESH_TOKEN }}
         run: python scripts/monthly_report.py
