@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
 YouTubeアナリティクスの月間レポートを ChatWork に自動送信するスクリプト。
-GitHub Actions から毎月1日 朝9時（JST）に自動実行される（monthly-report.yml）。
+GitHub Actions から毎月30日（2月のみ28日）朝10時（JST）に自動実行される（monthly-report.yml）。
 
-data/analytics.json の日次スナップショット履歴から前月分の増加数を計算し、
-前月に公開された動画の成績と合わせて ChatWork ルームへ投稿する。
+YouTube Analytics API から当月の指標（前月比付き）を取得し、
+当月に公開された動画の成績と合わせて ChatWork ルームへ投稿する。
 
 必要な環境変数:
   CHATWORK_API_TOKEN  - ChatWork API トークン
@@ -277,10 +277,8 @@ def main():
 
     month = os.environ.get("REPORT_MONTH")
     if not month:
-        # 実行日の前月をレポート対象にする（毎月1日実行想定）
-        first_of_this_month = datetime.now(JST).replace(day=1)
-        prev = first_of_this_month - timedelta(days=1)
-        month = prev.strftime("%Y-%m")
+        # 実行日の当月をレポート対象にする（毎月30日実行想定）
+        month = datetime.now(JST).strftime("%Y-%m")
 
     message = build_report(data, month)
     print("---- 送信内容 ----")
