@@ -1,11 +1,11 @@
 {
- "updatedAt": "2026-07-09T10:54:13+09:00",
+ "updatedAt": "2026-07-10T04:50:17+09:00",
  "channel": {
   "id": "UCjqBCrrp1mfDBTKxyzMUgrA",
   "title": "かず | ONE代表",
   "thumbnail": "https://yt3.ggpht.com/yQhIMJ_RzIpvdQcO-pvnD2ywPkbEg49xDlbBpaS5GV__KAkQnfpwHjEwpA0fyQnkVlWvSc845Q=s240-c-k-c0x00ffffff-no-rj",
   "subscriberCount": 6040,
-  "viewCount": 343272,
+  "viewCount": 343304,
   "videoCount": 419
  },
  "videos": [
@@ -14,7 +14,7 @@
    "title": "【🚨超重要🚨】みなさんへ大事なお知らせがあります！",
    "publishedAt": "2026-07-05T10:00:20Z",
    "thumbnail": "https://i.ytimg.com/vi/kPyKS03WAAI/mqdefault.jpg",
-   "views": 143,
+   "views": 151,
    "likes": 9,
    "comments": 0,
    "duration": "PT3M40S"
@@ -24,7 +24,7 @@
    "title": "Amazon電脳で月100万達成できたマキさんに来てもらいましたin沖縄！【副業】【せどり】【Amazon】",
    "publishedAt": "2026-06-28T10:00:32Z",
    "thumbnail": "https://i.ytimg.com/vi/vUjXa_GtvSI/mqdefault.jpg",
-   "views": 119,
+   "views": 123,
    "likes": 10,
    "comments": 0,
    "duration": "PT12M21S"
@@ -34,7 +34,7 @@
    "title": "【極楽】沖縄オフ会終えてリゾートホテルに来た！",
    "publishedAt": "2026-06-21T10:00:27Z",
    "thumbnail": "https://i.ytimg.com/vi/agAl9qBR-bw/mqdefault.jpg",
-   "views": 102,
+   "views": 103,
    "likes": 4,
    "comments": 0,
    "duration": "PT3M53S"
@@ -64,7 +64,7 @@
    "title": "借金500万から月300万を達成！！eBay講師尾形さん【せどり】【副業】【eBay】",
    "publishedAt": "2026-05-31T10:00:00Z",
    "thumbnail": "https://i.ytimg.com/vi/QedA_EvgOMw/mqdefault.jpg",
-   "views": 92,
+   "views": 93,
    "likes": 4,
    "comments": 0,
    "duration": "PT5M16S"
@@ -104,7 +104,7 @@
    "title": "【初登場】開始8ヶ月で200万！アパレル講師の堤さん！【せどり】【副業】【メルカリ】",
    "publishedAt": "2026-05-03T10:00:11Z",
    "thumbnail": "https://i.ytimg.com/vi/8uaONqsLTRM/mqdefault.jpg",
-   "views": 124,
+   "views": 125,
    "likes": 6,
    "comments": 0,
    "duration": "PT3M30S"
@@ -114,7 +114,7 @@
    "title": "【重大発表】ONEグループは上場企業グループに入ることになりました！年商100億を目指します！",
    "publishedAt": "2026-04-26T10:00:39Z",
    "thumbnail": "https://i.ytimg.com/vi/P_FsaCg8IFM/mqdefault.jpg",
-   "views": 212,
+   "views": 213,
    "likes": 11,
    "comments": 0,
    "duration": "PT5M5S"
@@ -154,7 +154,7 @@
    "title": "【久々登場】こはく君の100円コンテンツ販売します！【せどり】【副業】【メルカリ】",
    "publishedAt": "2026-03-29T10:00:00Z",
    "thumbnail": "https://i.ytimg.com/vi/ITkfPOGTYNU/mqdefault.jpg",
-   "views": 192,
+   "views": 194,
    "likes": 7,
    "comments": 0,
    "duration": "PT4M1S"
@@ -184,7 +184,7 @@
    "title": "【初登場】Amazon物販で月700万稼ぐ3児のパパ永田さん【せどり】【副業】【Amazon】",
    "publishedAt": "2026-03-01T10:00:08Z",
    "thumbnail": "https://i.ytimg.com/vi/7U7QliSWA7c/mqdefault.jpg",
-   "views": 157,
+   "views": 158,
    "likes": 3,
    "comments": 0,
    "duration": "PT4M23S"
@@ -194,7 +194,7 @@
    "title": "Amazon物販で月1,000万!?Amazon講師のくぶきさん！【せどり】【副業】【Amazon】",
    "publishedAt": "2026-02-17T10:00:20Z",
    "thumbnail": "https://i.ytimg.com/vi/GzyiUn7uAM4/mqdefault.jpg",
-   "views": 235,
+   "views": 236,
    "likes": 3,
    "comments": 0,
    "duration": "PT9M42S"
@@ -515,6 +515,12 @@
    "date": "2026-07-09",
    "subscriberCount": 6040,
    "viewCount": 343272,
+   "videoCount": 419
+  },
+  {
+   "date": "2026-07-10",
+   "subscriberCount": 6040,
+   "viewCount": 343304,
    "videoCount": 419
   }
  ]
