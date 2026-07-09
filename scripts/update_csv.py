@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 """
 Googleスプレッドシートから最新CSVを取得してindex.htmlの埋め込みデータを更新するスクリプト。
+また、公開シート一覧から「YYYY/M」形式のシートを自動発見し、index.htmlの
+SHEET_URLS（月タブの読み込み先）を自動更新する。スプレッドシートに新しい月の
+シートを追加するだけで、翌日（または手動実行時）にダッシュボードへ反映される。
 GitHub Actionsから毎日自動実行される。
 """
 import urllib.request
 import re
 import sys
+
+SPREADSHEET_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTiXK04o9Zv9OnUO5jYZ6wsc5C6UzJGeafQgDXUeVT4l7iaJ7kM6-lf_o5dc5mQJmU-tXZ_p7Edodpc"
+PUBHTML_URL = f"{SPREADSHEET_BASE}/pubhtml"
+# ダッシュボード運用開始月（これより前のシートはタブに出さない）
+FIRST_MONTH = "2026-03"
 
 # 更新対象のGoogleスプレッドシートURL（index.htmlのSHEET_URLSと同じ）
 TARGETS = [
@@ -78,6 +86,51 @@ def update_html(html: str, marker: str, var_name: str, csv_text: str) -> str:
     return updated
 
 
+def discover_month_sheets():
+    """公開シート一覧(pubhtml)から「YYYY/M」形式のシートを見つけて
+    [{key, label, gid}, ...] を返す（FIRST_MONTH以降のみ・月順）。"""
+    try:
+        req = urllib.request.Request(PUBHTML_URL, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            page = resp.read().decode("utf-8")
+    except Exception as e:
+        print(f"WARNING: シート一覧の取得に失敗: {e}", file=sys.stderr)
+        return None
+
+    sheets = []
+    for m in re.finditer(r'items\.push\(\{name: "(\d{4})\\?/(\d{1,2})".*?gid=(\d+)', page):
+        y, mo, gid = int(m.group(1)), int(m.group(2)), m.group(3)
+        key = f"{y:04d}-{mo:02d}"
+        if key >= FIRST_MONTH:
+            sheets.append({"key": key, "label": f"{y}年{mo}月", "gid": gid})
+    sheets.sort(key=lambda s: s["key"])
+    return sheets or None
+
+
+def update_sheet_urls(html: str) -> str:
+    """index.htmlのSHEET_URLS（月タブの読み込み先一覧）をシート一覧から再生成する。"""
+    sheets = discover_month_sheets()
+    if not sheets:
+        print("SHEET_URLS: シート一覧が取得できないためスキップ（現状維持）")
+        return html
+
+    entries = ",\n".join(
+        f"  {{ key:'{s['key']}', label:'{s['label']}', "
+        f"url:'{SPREADSHEET_BASE}/pub?gid={s['gid']}&single=true&output=csv' }}"
+        for s in sheets
+    )
+    start_tag = "// <<AUTO_UPDATE_SHEETS_START>>"
+    end_tag = "// <<AUTO_UPDATE_SHEETS_END>>"
+    replacement = f"{start_tag}\nvar SHEET_URLS = [\n{entries}\n];\n{end_tag}"
+    pattern = re.compile(re.escape(start_tag) + r".*?" + re.escape(end_tag), re.DOTALL)
+    updated, count = pattern.subn(lambda _: replacement, html)
+    if count == 0:
+        print(f"  ERROR: マーカーが見つかりません: {start_tag}", file=sys.stderr)
+        return html
+    print(f"SHEET_URLS: {len(sheets)}ヶ月分に更新（{sheets[0]['key']}〜{sheets[-1]['key']}）")
+    return updated
+
+
 def main():
     with open(HTML_PATH, "r", encoding="utf-8") as f:
         html = f.read()
@@ -92,6 +145,12 @@ def main():
 
         html = update_html(html, target["marker"], target["var"], csv_text)
         print(f"  OK: {target['var']} を更新しました")
+        updated = True
+
+    # 月タブの読み込み先一覧をシート一覧から自動更新（新しい月のシートを自動反映）
+    new_html = update_sheet_urls(html)
+    if new_html != html:
+        html = new_html
         updated = True
 
     if updated:
