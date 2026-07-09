@@ -97,10 +97,28 @@ def fetch_yt_analytics(month: str):
         }
     except urllib.error.HTTPError as e:
         try:
-            msg = json.loads(e.read().decode()).get("error", {}).get("message", "")
+            body = e.read().decode()
         except Exception:
-            msg = ""
-        print(f"WARNING: Analytics API HTTP {e.code}: {msg} → 公開データのみでレポートします", file=sys.stderr)
+            body = ""
+        print(f"WARNING: Analytics API HTTP {e.code}: {body[:500]} → 公開データのみでレポートします", file=sys.stderr)
+        if e.code == 403:
+            # 診断: 認証済みアカウント自身のチャンネル(MINE)なら読めるかを確認する。
+            # MINEが成功して指定チャンネルが403の場合、認証時に選んだ身元が対象チャンネルと別物。
+            try:
+                p2 = urllib.parse.urlencode({
+                    "ids": "channel==MINE", "startDate": start, "endDate": end_day,
+                    "metrics": "views",
+                })
+                req2 = urllib.request.Request(
+                    f"https://youtubeanalytics.googleapis.com/v2/reports?{p2}",
+                    headers={"Authorization": f"Bearer {access_token}"},
+                )
+                with urllib.request.urlopen(req2, timeout=20) as r2:
+                    json.loads(r2.read().decode())
+                print("診断: channel==MINE は成功 → 認証した身元は対象チャンネルではありません。"
+                      "OAuth承認時のアカウント選択で対象チャンネル（ブランドアカウント）を選ぶ必要があります。", file=sys.stderr)
+            except Exception as e2:
+                print(f"診断: channel==MINE も失敗（{e2}）→ 認証した身元はどのチャンネルの権限も持っていません。", file=sys.stderr)
         return None
     except Exception as e:
         print(f"WARNING: Analytics API取得失敗: {e} → 公開データのみでレポートします", file=sys.stderr)
