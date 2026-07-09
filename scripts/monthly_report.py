@@ -160,10 +160,11 @@ def cmp_pt(cur, prev) -> str:
     return f"（前月比 {sign}{d:.1f}pt）"
 
 
-def text_bar(ratio: float, width: int = 20) -> str:
-    """0.0〜1.0の比率をテキストの棒グラフにする（ChatWork本文用）"""
+def text_bar(ratio: float, width: int = 10) -> str:
+    """0.0〜1.0の比率をテキストの棒グラフにする（ChatWork本文用）。
+    絵文字の四角はドット模様が出ずソリッドに表示される（◼️はグレー系）。"""
     filled = max(0, min(width, round(ratio * width)))
-    return "▓" * filled + "░" * (width - filled)
+    return "◼️" * filled + "◻️" * (width - filled)
 
 
 def build_report(data: dict, month: str) -> str:
@@ -229,7 +230,7 @@ def build_report(data: dict, month: str) -> str:
             title = v["title"][:45] + ("…" if len(v["title"]) > 45 else "")
             share = v["views"] / total_views * 100
             lines.append(f"{medal}：{title}（{v['views']:,}回）")
-            lines.append(f"　　{text_bar(v['views'] / max_views, 14)}（シェア {share:.0f}%）")
+            lines.append(f"　　{text_bar(v['views'] / max_views, 10)}（シェア {share:.0f}%）")
             if medal.endswith("1位"):
                 lines.append(f"🔗 リンク：https://youtu.be/{v['id']}")
                 lines.append("")
