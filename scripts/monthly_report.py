@@ -203,7 +203,7 @@ def build_report(data: dict, month: str) -> str:
     lines.append("https://one-controlpanel.github.io/youtube-schedule/")
 
     body = "\n".join(lines)
-    title = f"▶️ 月間YouTubeのアナリティクスレポート（{label}）"
+    title = f"▶️ 月間YouTubeアナリティクスレポート（{label}）"
     return f"[info][title]{title}[/title]{body}[/info]"
 
 
