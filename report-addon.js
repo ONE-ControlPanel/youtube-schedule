@@ -26,6 +26,13 @@
       var m = String(r.dateStr).match(/(\d{1,2})\D+(\d{1,2})\D*$/);
       if (m) md = parseInt(m[1],10) + '/' + parseInt(m[2],10);
     }
+    // 入力欄に未保存のリンクがあれば拾って自動保存する
+    var inputId = 'yt-url-' + window.__fbCurKey + '_' + window.__fbCurNo;
+    var input = document.getElementById(inputId);
+    if (input && input.value.trim() && input.value.trim() !== (r.youtubeLink || '')) {
+      try { window.saveYtLink(window.__fbCurKey, window.__fbCurNo, inputId); } catch(e){}
+      r.youtubeLink = input.value.trim();
+    }
     var link = (r.youtubeLink || '').trim();
     if (!link) {
       link = (prompt('予約リンク（YouTubeのURL）を入力してください。\n空欄のままOKを押すと「（リンク未記入）」になります。','') || '').trim();

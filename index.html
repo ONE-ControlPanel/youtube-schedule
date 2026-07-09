@@ -764,12 +764,11 @@ function buildYtActionHtml(r) {
     '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;">' +
       '<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">YouTube予約リンク</div>' +
       '<div style="display:flex;gap:8px;align-items:center;">' +
-        '<input type="text" id="yt-url-'+itemKey+'" placeholder="https://youtu.be/..." value="'+currentUrl+'" ' +
+        '<input type="text" id="yt-url-'+itemKey+'" placeholder="https://youtu.be/...（入力すると自動保存）" value="'+currentUrl+'" ' +
           'style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:\'Space Mono\',monospace;font-size:11px;outline:none;" ' +
-          'onfocus="this.style.borderColor=\'var(--accent2)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
-        '<button onclick="saveYtLink(\''+r._monthKey+'\','+r.no+',\'yt-url-'+itemKey+'\')" ' +
-          'style="padding:9px 16px;background:var(--accent2);border:none;border-radius:7px;color:white;font-family:\'Noto Sans JP\',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;" ' +
-          'onmouseover="this.style.opacity=\'0.85\'" onmouseout="this.style.opacity=\'1\'">保存</button>' +
+          'onfocus="this.style.borderColor=\'var(--accent2)\'" ' +
+          'onblur="this.style.borderColor=\'var(--border)\'" ' +
+          'onchange="saveYtLink(\''+r._monthKey+'\','+r.no+',\'yt-url-'+itemKey+'\')">' +
       '</div>' +
       (currentUrl ?
         '<a href="'+currentUrl+'" target="_blank" id="yt-preview-'+itemKey+'" ' +
@@ -1342,5 +1341,5 @@ var CSV_MAY = ',,,,,,,,,,,,,,,,,,\n' +
     });
   });
 })();</script>
-<script src="firebase-addon.js?v=7"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=2"></script></body>
+<script src="firebase-addon.js?v=7"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=3"></script></body>
 </html>
