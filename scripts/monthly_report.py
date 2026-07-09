@@ -160,6 +160,12 @@ def cmp_pt(cur, prev) -> str:
     return f"（前月比 {sign}{d:.1f}pt）"
 
 
+def text_bar(ratio: float, width: int = 20) -> str:
+    """0.0〜1.0の比率をテキストの棒グラフにする（ChatWork本文用）"""
+    filled = max(0, min(width, round(ratio * width)))
+    return "█" * filled + "░" * (width - filled)
+
+
 def build_report(data: dict, month: str) -> str:
     start, end = month_range(month)
     history = data.get("history", [])
@@ -199,6 +205,7 @@ def build_report(data: dict, month: str) -> str:
         f"・⏱️ 総再生時間：{watch_time}",
         f"・🕒 平均視聴時間：{avg_view}",
         f"・📉 視聴維持率：{retention}",
+    ] + ([f"　　{text_bar(an['avgViewPct'] / 100)} {an['avgViewPct']:.0f}%"] if an else []) + [
         "",
         "🌍オーディエンス",
         f"・👥現在のチャンネル登録者数：{subs_now}",
@@ -216,9 +223,13 @@ def build_report(data: dict, month: str) -> str:
     published.sort(key=lambda v: v["views"], reverse=True)
     medals = ["🏆 1位", "🥈 2位", "🥉 3位", "✨ 4位"]
     if published:
+        total_views = sum(v["views"] for v in published) or 1
+        max_views = published[0]["views"] or 1
         for medal, v in zip(medals, published):
             title = v["title"][:45] + ("…" if len(v["title"]) > 45 else "")
+            share = v["views"] / total_views * 100
             lines.append(f"{medal}：{title}（{v['views']:,}回）")
+            lines.append(f"　　{text_bar(v['views'] / max_views, 14)}（シェア {share:.0f}%）")
             if medal.endswith("1位"):
                 lines.append(f"🔗 リンク：https://youtu.be/{v['id']}")
                 lines.append("")
