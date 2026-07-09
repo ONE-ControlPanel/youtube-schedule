@@ -50,44 +50,61 @@ def build_report(data: dict, month: str) -> str:
     channel = data.get("channel", {})
     label = f"{int(month[:4])}年{int(month[5:7])}月"
 
-    lines = []
     # スナップショットは毎日 午前3時(JST)取得のため、月初日のものが「月開始時点」に相当する
     snap_start = pick_snapshot(history, start, after=True) or pick_snapshot(history, start, after=False)
     snap_end = pick_snapshot(history, end, after=True) or (history[-1] if history else None)
+    has_delta = snap_start and snap_end and snap_start["date"] < snap_end["date"]
 
-    if snap_start and snap_end and snap_start["date"] < snap_end["date"]:
-        lines.append(f"▼ チャンネル全体（{snap_start['date']} → {snap_end['date']}）")
-        lines.append(f"・チャンネル登録者：{snap_end['subscriberCount']:,} 人（{fmt_delta(snap_end['subscriberCount'] - snap_start['subscriberCount'])} 人）")
-        lines.append(f"・総再生回数：{snap_end['viewCount']:,} 回（{fmt_delta(snap_end['viewCount'] - snap_start['viewCount'])} 回）")
-        lines.append(f"・公開動画数：{snap_end['videoCount']:,} 本（{fmt_delta(snap_end['videoCount'] - snap_start['videoCount'])} 本）")
+    if has_delta:
+        views_line = f"{fmt_delta(snap_end['viewCount'] - snap_start['viewCount'])} 回（累計 {snap_end['viewCount']:,} 回）"
+        subs_delta = f"{fmt_delta(snap_end['subscriberCount'] - snap_start['subscriberCount'])} 人"
+        subs_now = f"{snap_end['subscriberCount']:,} 人"
     else:
         # 履歴が1ヶ月分溜まっていない初回などは現在値のみ報告
-        lines.append("▼ チャンネル全体（現在値 ※増加数は履歴が溜まり次第表示されます）")
-        lines.append(f"・チャンネル登録者：{channel.get('subscriberCount', 0):,} 人")
-        lines.append(f"・総再生回数：{channel.get('viewCount', 0):,} 回")
-        lines.append(f"・公開動画数：{channel.get('videoCount', 0):,} 本")
+        views_line = f"累計 {channel.get('viewCount', 0):,} 回（月間増加は翌月分から表示）"
+        subs_delta = "―（計測開始月のため翌月分から表示）"
+        subs_now = f"{channel.get('subscriberCount', 0):,} 人"
 
-    # 対象月に公開された動画の成績（再生数順）
+    NA = "―"
+    lines = [
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "📊 エンゲージメント",
+        f"・▶️ 総再生回数：{views_line}",
+        f"・⏱️ 総再生時間：{NA}",
+        f"・🕒 平均視聴時間：{NA}",
+        f"・📉 視聴維持率：{NA}",
+        "",
+        "🌍 オーディエンス",
+        f"・👥 現在のチャンネル登録者数：{subs_now}",
+        f"・📈 チャンネル登録者数の純増減：{subs_delta}",
+        f"・👤 ユニーク視聴者数：{NA}",
+        "",
+        f"※「{NA}」の項目はチャンネル所有者のYouTube Studio連携が必要なため未取得です",
+        "",
+        "🔴 月間上位コンテンツ",
+    ]
+
+    # 対象月に公開された動画の上位4本（再生数順）
     published = [v for v in data.get("videos", [])
                  if start <= (v.get("publishedAt") or "")[:10] < end]
     published.sort(key=lambda v: v["views"], reverse=True)
-    lines.append("")
+    medals = ["🏆 1位", "🥈 2位", "🥉 3位", "✨ 4位"]
     if published:
-        lines.append(f"▼ {label}に公開した動画（{len(published)}本 / 再生数順）")
-        for i, v in enumerate(published, 1):
-            title = v["title"][:40] + ("…" if len(v["title"]) > 40 else "")
-            lines.append(f"{i}. {title}")
-            lines.append(f"   再生 {v['views']:,} ／ 高評価 {v['likes']:,} ／ コメント {v['comments']:,}")
-            lines.append(f"   https://youtu.be/{v['id']}")
+        for medal, v in zip(medals, published):
+            title = v["title"][:45] + ("…" if len(v["title"]) > 45 else "")
+            lines.append(f"{medal}：{title}（{v['views']:,}回）")
+            if medal.endswith("1位"):
+                lines.append(f"🔗 リンク：https://youtu.be/{v['id']}")
     else:
-        lines.append(f"▼ {label}に公開した動画：なし")
+        lines.append(f"{label}に公開された動画はありませんでした")
 
     lines.append("")
     lines.append("📈 詳細ダッシュボード")
     lines.append("https://one-controlpanel.github.io/youtube-schedule/")
 
     body = "\n".join(lines)
-    title = f"📊 かずさんYouTube 月間レポート（{label}）"
+    title = f"▶️ 月間YouTubeアナリティクスレポート（{label}）"
     return f"[info][title]{title}[/title]{body}[/info]"
 
 
