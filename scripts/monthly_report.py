@@ -229,11 +229,15 @@ def build_report(data: dict, month: str) -> str:
         for medal, v in zip(medals, published):
             title = v["title"][:45] + ("…" if len(v["title"]) > 45 else "")
             share = v["views"] / total_views * 100
+            bar_line = f"　　{text_bar(v['views'] / max_views, 10)}（シェア {share:.0f}%）"
             lines.append(f"{medal}：{title}（{v['views']:,}回）")
-            lines.append(f"　　{text_bar(v['views'] / max_views, 10)}（シェア {share:.0f}%）")
             if medal.endswith("1位"):
+                # 1位のみ リンク → バー の順で表示する
                 lines.append(f"🔗 リンク：https://youtu.be/{v['id']}")
+                lines.append(bar_line)
                 lines.append("")
+            else:
+                lines.append(bar_line)
     else:
         lines.append(f"{label}に公開された動画はありませんでした")
 
