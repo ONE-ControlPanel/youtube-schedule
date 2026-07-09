@@ -23,11 +23,21 @@ JST = timezone(timedelta(hours=9))
 
 
 def api_get(endpoint: str, params: dict) -> dict:
-    params["key"] = os.environ["YOUTUBE_API_KEY"]
+    params["key"] = os.environ["YOUTUBE_API_KEY"].strip()
     url = f"{API_BASE}/{endpoint}?{urllib.parse.urlencode(params)}"
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        # APIのエラー理由（キー無効・API未有効化・リファラ制限など）を表示して終了
+        try:
+            detail = json.loads(e.read().decode("utf-8"))
+            reason = detail.get("error", {}).get("message", "")
+        except Exception:
+            reason = ""
+        print(f"ERROR: YouTube API {endpoint} が HTTP {e.code}: {reason}", file=sys.stderr)
+        sys.exit(1)
 
 
 def resolve_channel(channel: str) -> dict:
