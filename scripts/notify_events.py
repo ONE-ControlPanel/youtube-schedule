@@ -185,7 +185,9 @@ def main():
     if first_run:
         print("初回実行: 既存の予約・公開分を記録します（通知はしません）")
 
-    n1 = check_reserved(state, first_run)
+    # 予約完了はダッシュボードの「予約完了をCWに報告」ボタンに移行したため、
+    # スプレッドシート検知は停止（二重通知防止）。record残しのため関数は保持。
+    n1 = []
     n2 = check_published(state, first_run)
 
     os.makedirs(os.path.dirname(STATE_PATH), exist_ok=True)
