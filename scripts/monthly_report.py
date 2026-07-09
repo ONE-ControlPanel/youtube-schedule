@@ -163,7 +163,7 @@ def cmp_pt(cur, prev) -> str:
 def text_bar(ratio: float, width: int = 20) -> str:
     """0.0〜1.0の比率をテキストの棒グラフにする（ChatWork本文用）"""
     filled = max(0, min(width, round(ratio * width)))
-    return "█" * filled + "░" * (width - filled)
+    return "▓" * filled + "░" * (width - filled)
 
 
 def build_report(data: dict, month: str) -> str:
