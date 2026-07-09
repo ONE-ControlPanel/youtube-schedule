@@ -1,0 +1,36 @@
+name: 月間レポートをChatWorkに自動送信
+
+on:
+  # 毎月1日 午前9時（日本時間）= 前月分のレポートを送信（UTC 0:00）
+  schedule:
+    - cron: '0 0 1 * *'
+  # 手動実行（対象月を指定可能）
+  workflow_dispatch:
+    inputs:
+      report_month:
+        description: '対象月（例: 2026-06）。空欄なら前月'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  send-monthly-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Python をセットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 月間レポートを生成してChatWorkへ送信
+        env:
+          CHATWORK_API_TOKEN: ${{ secrets.CHATWORK_API_TOKEN }}
+          CHATWORK_ROOM_ID: ${{ secrets.CHATWORK_ROOM_ID }}
+          REPORT_MONTH: ${{ github.event.inputs.report_month }}
+        run: python scripts/monthly_report.py
