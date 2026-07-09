@@ -135,6 +135,31 @@ def fmt_min_sec(seconds: int) -> str:
     return f"{seconds // 60} 分 {seconds % 60} 秒"
 
 
+def prev_month_of(month: str) -> str:
+    """'2026-06' → '2026-05'"""
+    y, m = map(int, month.split("-"))
+    py, pm = (y - 1, 12) if m == 1 else (y, m - 1)
+    return f"{py:04d}-{pm:02d}"
+
+
+def cmp_pct(cur, prev) -> str:
+    """前月比の増減率を「（前月比 +12.3%）」形式で返す"""
+    if prev is None or prev == 0:
+        return ""
+    d = (cur - prev) / prev * 100
+    sign = "+" if d >= 0 else ""
+    return f"（前月比 {sign}{d:.1f}%）"
+
+
+def cmp_pt(cur, prev) -> str:
+    """視聴維持率など%系指標の前月差を「（前月比 +1.2pt）」形式で返す"""
+    if prev is None:
+        return ""
+    d = cur - prev
+    sign = "+" if d >= 0 else ""
+    return f"（前月比 {sign}{d:.1f}pt）"
+
+
 def build_report(data: dict, month: str) -> str:
     start, end = month_range(month)
     history = data.get("history", [])
@@ -148,13 +173,15 @@ def build_report(data: dict, month: str) -> str:
 
     NA = "―"
     an = fetch_yt_analytics(month)  # OAuth設定済みならStudio相当の指標を取得
-    watch_time = fmt_hours(an["watchMinutes"]) if an else NA
-    avg_view = fmt_min_sec(an["avgViewSec"]) if an else NA
-    retention = f"{an['avgViewPct']:.1f} %" if an else NA
+    prev = fetch_yt_analytics(prev_month_of(month)) if an else None  # 前月比用
+
+    watch_time = fmt_hours(an["watchMinutes"]) + cmp_pct(an["watchMinutes"], prev and prev["watchMinutes"]) if an else NA
+    avg_view = fmt_min_sec(an["avgViewSec"]) + cmp_pct(an["avgViewSec"], prev and prev["avgViewSec"]) if an else NA
+    retention = f"{an['avgViewPct']:.1f} %" + cmp_pt(an["avgViewPct"], prev and prev["avgViewPct"]) if an else NA
 
     if an:
-        views_line = f"{an['views']:,} 回（月間）"
-        subs_delta = f"{fmt_delta(an['subsNet'])} 人"
+        views_line = f"{an['views']:,} 回" + cmp_pct(an["views"], prev and prev["views"])
+        subs_delta = f"{fmt_delta(an['subsNet'])} 人" + (f"（前月：{fmt_delta(prev['subsNet'])} 人）" if prev else "")
     elif has_delta:
         views_line = f"{fmt_delta(snap_end['viewCount'] - snap_start['viewCount'])} 回（累計 {snap_end['viewCount']:,} 回）"
         subs_delta = f"{fmt_delta(snap_end['subscriberCount'] - snap_start['subscriberCount'])} 人"
