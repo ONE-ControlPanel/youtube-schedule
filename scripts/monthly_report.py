@@ -176,7 +176,6 @@ def build_report(data: dict, month: str) -> str:
         "🌍オーディエンス",
         f"・👥現在のチャンネル登録者数：{subs_now}",
         f"・📈チャンネル登録者数の純増減：{subs_delta}",
-        f"・👤ユニーク視聴者数：{NA}（APIでは提供されない項目です）",
     ]
     if not an:
         lines.append("")
