@@ -878,7 +878,23 @@ function showDetail(key, no) {
   var s = getStatus(r);
   var dateDisp = r.date ? r.date.toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'long'}) : r.dateStr;
   var origDisp = (r.changedDate && r.origDate && r.changedDate!==r.dateStr) ? r.origDate.toLocaleDateString('ja-JP',{month:'2-digit',day:'2-digit'}) : null;
-  var link = function(lbl, url) { return url ? '<div class="modal-section"><div class="modal-section-label">'+lbl+'</div><a href="'+url+'" target="_blank" class="modal-link">'+(url.length>60?url.slice(0,60)+'…':url)+'</a></div>' : ''; };
+  var link = function(lbl, url) {
+    if (!url) return '';
+    // 画像プレビュー（直リンク画像 or Gyazo のとき表示。読めない場合は自動で非表示）
+    var preview = '';
+    var gy = url.match(/gyazo\.com\/([a-z0-9]+)/i);
+    if (gy) {
+      preview = '<img src="https://i.gyazo.com/'+gy[1]+'.png" loading="lazy" onerror="var s=[\'jpg\',\'gif\',\'webp\'];this.dataset.i=(+this.dataset.i||0);if(this.dataset.i<s.length){this.src=\'https://i.gyazo.com/'+gy[1]+'.\'+s[this.dataset.i++];}else{this.style.display=\'none\';}" style="max-width:100%;max-height:220px;border-radius:8px;margin-top:8px;border:1px solid var(--border);display:block;">';
+    } else if (/\.(png|jpe?g|gif|webp|bmp)(\?|$)/i.test(url)) {
+      preview = '<img src="'+url+'" loading="lazy" onerror="this.style.display=\'none\'" style="max-width:100%;max-height:220px;border-radius:8px;margin-top:8px;border:1px solid var(--border);display:block;">';
+    }
+    return '<div class="modal-section"><div class="modal-section-label">'+lbl+'</div>' +
+      '<a href="'+url+'" target="_blank" rel="noopener" class="modal-link" ' +
+      'style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;text-decoration:none;max-width:100%;" ' +
+      'onmouseover="this.style.borderColor=\'var(--accent2)\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+      '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(url.length>55?url.slice(0,55)+'…':url)+'</span>' +
+      '<span style="flex-shrink:0;">↗</span></a>' + preview + '</div>';
+  };
   var norm = function(v){ v=(v||"").replace(/\s/g,""); return (v&&v!=="空白")?v:""; };
   var checks = [
     {label:"動画確認",    field:"videoCheck",    val:norm(r.videoCheck),  toggle:true},
@@ -1341,5 +1357,5 @@ var CSV_MAY = ',,,,,,,,,,,,,,,,,,\n' +
     });
   });
 })();</script>
-<script src="firebase-addon.js?v=7"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=3"></script><script src="firestore-data-addon.js?v=1"></script></body>
+<script src="firebase-addon.js?v=7"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=3"></script><script src="firestore-data-addon.js?v=1"></script><script src="ui-enhance-addon.js?v=1"></script></body>
 </html>
