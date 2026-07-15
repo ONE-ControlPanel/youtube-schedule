@@ -238,7 +238,10 @@
 
   // ---------- 起動 ----------
   function boot(){
-    if (!fb() || !fb().auth){ setTimeout(boot, 500); return; }
+    // SDK読み込みだけでなく initializeApp 完了(apps.length>0)まで待つ
+    try {
+      if (!fb() || !fb().auth || !fb().apps || !fb().apps.length){ setTimeout(boot, 500); return; }
+    } catch(e){ setTimeout(boot, 500); return; }
     fb().auth().onAuthStateChanged(function(user){
       if (!user || MODE) return;
       db().collection('edits').where('_full','==',true).limit(1).get().then(function(snap){
