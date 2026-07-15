@@ -708,12 +708,16 @@ function renderDashboard(key) {
     var todayMark = isToday ? '<span class="today-marker">TODAY</span>' : '';
     var changed = r.changedDate && r.origDate && r.changedDate!==r.dateStr;
     var changedMark = changed ? '<span class="changed-badge">&#10149; 日付変更</span>' : '';
-    // サムネプレビュー（サムネ画像案/サムネ納品URLからGyazo・画像直リンクを抽出）
+    // サムネプレビュー（YouTubeの実サムネを最優先 → サムネ画像案のGyazo/画像直リンク）
     var thumbSrc = '';
-    var tsrc = (r.thumbIdea||'') + ' ' + (r.thumbUrl||'');
-    var gy = tsrc.match(/gyazo\.com\/([a-z0-9]{10,})/i);
-    if (gy) thumbSrc = 'https://i.gyazo.com/' + gy[1] + '.jpg';
-    else { var im = tsrc.match(/https?:\/\/[^\s"']+\.(?:png|jpe?g|gif|webp)/i); if (im) thumbSrc = im[0]; }
+    var ytm = (r.youtubeLink||'').match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/)([\w-]{11})/);
+    if (ytm) thumbSrc = 'https://i.ytimg.com/vi/' + ytm[1] + '/mqdefault.jpg';
+    else {
+      var tsrc = (r.thumbIdea||'') + ' ' + (r.thumbUrl||'');
+      var gy = tsrc.match(/gyazo\.com\/([a-z0-9]{10,})/i);
+      if (gy) thumbSrc = 'https://i.gyazo.com/' + gy[1] + '.jpg';
+      else { var im = tsrc.match(/https?:\/\/[^\s"']+\.(?:png|jpe?g|gif|webp)/i); if (im) thumbSrc = im[0]; }
+    }
     var thumbCell = thumbSrc
       ? '<img src="'+thumbSrc+'" loading="lazy" onerror="if(!this.dataset.p){this.dataset.p=1;this.src=this.src.replace(/\.jpg$/,\'.png\');}else{this.style.display=\'none\';}" style="width:72px;height:40px;object-fit:cover;border-radius:5px;display:block;">'
       : '<span style="color:var(--text-dim)">&#8212;</span>';
