@@ -719,7 +719,7 @@ function renderDashboard(key) {
       else { var im = tsrc.match(/https?:\/\/[^\s"']+\.(?:png|jpe?g|gif|webp)/i); if (im) thumbSrc = im[0]; }
     }
     var thumbCell = thumbSrc
-      ? '<img src="'+thumbSrc+'" loading="lazy" onerror="if(!this.dataset.p){this.dataset.p=1;this.src=this.src.replace(/\.jpg$/,\'.png\');}else{this.style.display=\'none\';}" style="width:72px;height:40px;object-fit:cover;border-radius:5px;display:block;">'
+      ? '<img src="'+thumbSrc+'" onerror="if(!this.dataset.p){this.dataset.p=1;this.src=this.src.replace(/\.jpg$/,\'.png\');}else{this.style.display=\'none\';}" style="width:72px;height:40px;object-fit:cover;border-radius:5px;display:block;">'
       : '<span style="color:var(--text-dim)">&#8212;</span>';
     var noteHtml = r.notes ? '<div style="font-size:10px;color:var(--accent4);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px;" title="'+r.notes.replace(/"/g,'&quot;')+'">&#128221; '+r.notes.slice(0,40)+(r.notes.length>40?'…':'')+'</div>' : '';
     var lb = function(url, label){
