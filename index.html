@@ -660,7 +660,7 @@ function createDashboard(key) {
     '<input type="text" class="search-box" placeholder="タイトル・担当者で検索..." oninput="setSearch(\''+key+'\',this.value)">' +
     '</div>' +
     '<div class="table-wrapper"><table>' +
-    '<thead><tr><th>No</th><th>投稿予定日</th><th>動画タイトル</th><th>動画担当</th><th>サムネ担当</th><th>ステータス</th><th>動画確認</th><th>サムネ確認</th><th>予約投稿</th></tr></thead>' +
+    '<thead><tr><th>No</th><th>投稿予定日</th><th>サムネ</th><th>動画タイトル</th><th>動画担当</th><th>サムネ担当</th><th>ステータス</th><th>動画確認</th><th>サムネ確認</th><th>予約投稿</th><th>リンク</th></tr></thead>' +
     '<tbody id="tbody-'+key+'"></tbody></table></div>';
   document.getElementById('dashboards-container').appendChild(div);
 }
@@ -690,7 +690,7 @@ function renderDashboard(key) {
   if (q) rows = rows.filter(function(r){ return r.title.toLowerCase().indexOf(q)!==-1||r.videoStaff.toLowerCase().indexOf(q)!==-1||r.thumbStaff.toLowerCase().indexOf(q)!==-1; });
 
   var tbody = document.getElementById('tbody-'+key);
-  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state">該当するデータがありません</div></td></tr>'; return; }
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state">該当するデータがありません</div></td></tr>'; return; }
 
   var chk = function(v) {
     v = (v||'').replace(/\s/g,'');
@@ -708,16 +708,36 @@ function renderDashboard(key) {
     var todayMark = isToday ? '<span class="today-marker">TODAY</span>' : '';
     var changed = r.changedDate && r.origDate && r.changedDate!==r.dateStr;
     var changedMark = changed ? '<span class="changed-badge">&#10149; 日付変更</span>' : '';
+    // サムネプレビュー（サムネ画像案/サムネ納品URLからGyazo・画像直リンクを抽出）
+    var thumbSrc = '';
+    var tsrc = (r.thumbIdea||'') + ' ' + (r.thumbUrl||'');
+    var gy = tsrc.match(/gyazo\.com\/([a-z0-9]{10,})/i);
+    if (gy) thumbSrc = 'https://i.gyazo.com/' + gy[1] + '.jpg';
+    else { var im = tsrc.match(/https?:\/\/[^\s"']+\.(?:png|jpe?g|gif|webp)/i); if (im) thumbSrc = im[0]; }
+    var thumbCell = thumbSrc
+      ? '<img src="'+thumbSrc+'" loading="lazy" onerror="if(!this.dataset.p){this.dataset.p=1;this.src=this.src.replace(/\.jpg$/,\'.png\');}else{this.style.display=\'none\';}" style="width:72px;height:40px;object-fit:cover;border-radius:5px;display:block;">'
+      : '<span style="color:var(--text-dim)">&#8212;</span>';
+    var noteHtml = r.notes ? '<div style="font-size:10px;color:var(--accent4);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px;" title="'+r.notes.replace(/"/g,'&quot;')+'">&#128221; '+r.notes.slice(0,40)+(r.notes.length>40?'…':'')+'</div>' : '';
+    var lb = function(url, label){
+      if (!url) return '';
+      return '<a href="'+url+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" ' +
+        'style="display:inline-block;margin:1px 2px;padding:2px 7px;font-size:10px;border:1px solid var(--border);border-radius:6px;color:var(--accent2);text-decoration:none;white-space:nowrap;background:var(--surface2);" ' +
+        'onmouseover="this.style.borderColor=\'var(--accent2)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'+label+'</a>';
+    };
+    var linksCell = lb(r.deliveryUrl,'納品') + lb(r.reviewUrl,'校正') + lb(r.materialUrl1,'素材&#9312;') + lb(r.materialUrl2,'素材&#9313;') + lb(r.thumbUrl,'サムネ') + lb(r.youtubeLink,'&#9654; YT');
+    if (!linksCell) linksCell = '<span style="color:var(--text-dim)">&#8212;</span>';
     return '<tr class="'+trClass+'" onclick="showDetail(\''+key+'\','+r.no+')">' +
       '<td style="font-family:\'Space Mono\';font-size:11px;color:var(--text-muted)">'+r.no+'</td>' +
       '<td class="date-cell">'+dateDisp+todayMark+changedMark+'<span class="weekday-tag">'+r.weekday+'</span></td>' +
-      '<td class="title-cell">'+(r.title?'<div class="video-title" title="'+r.title+'">'+r.title+'</div>':'<div class="no-title">タイトル未設定</div>')+'</td>' +
+      '<td>'+thumbCell+'</td>' +
+      '<td class="title-cell">'+(r.title?'<div class="video-title" title="'+r.title+'">'+r.title+'</div>':'<div class="no-title">タイトル未設定</div>')+noteHtml+'</td>' +
       '<td>'+(r.videoStaff?'<span class="person-tag">'+r.videoStaff+'</span>':'<span style="color:var(--text-dim)">&#8212;</span>')+'</td>' +
       '<td>'+(r.thumbStaff?'<span class="person-tag">'+r.thumbStaff+'</span>':'<span style="color:var(--text-dim)">&#8212;</span>')+'</td>' +
       '<td>'+statusBadge(s)+'</td>' +
       '<td>'+chk(r.videoCheck)+'</td>' +
       '<td>'+chk(r.thumbCheck)+'</td>' +
       '<td>'+(r.reserved==='TRUE'?'<span style="color:var(--accent3)">&#10003;</span>':'<span style="color:var(--text-dim)">&#8212;</span>')+'</td>' +
+      '<td style="max-width:180px;">'+linksCell+'</td>' +
       '</tr>';
   }).join('');
 }
