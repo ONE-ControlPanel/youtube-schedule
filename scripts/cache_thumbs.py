@@ -98,6 +98,63 @@ def save_thumb(raw: bytes, out_path: str) -> bool:
         return False
 
 
+def autofill_youtube_links(id_token: str, docs: list) -> int:
+    """公開済み動画（analytics.json）と投稿予定日を照合して、
+    youtubeLink が空の行に youtu.be リンクを自動記入する"""
+    try:
+        with open("data/analytics.json", encoding="utf-8") as f:
+            videos = json.load(f).get("videos", [])
+    except Exception:
+        print("analytics.json が無いためリンク自動記入をスキップ")
+        return 0
+
+    # 公開日(JST) "YYYY-M-D" → videoId のマップ
+    from datetime import datetime, timezone, timedelta
+    jst = timezone(timedelta(hours=9))
+    by_date = {}
+    for v in videos:
+        try:
+            dt = datetime.fromisoformat(v["publishedAt"].replace("Z", "+00:00")).astimezone(jst)
+            by_date.setdefault(f"{dt.year}-{dt.month}-{dt.day}", v["id"])
+        except Exception:
+            pass
+
+    filled = 0
+    for doc in docs:
+        doc_id = doc["name"].rsplit("/", 1)[-1]
+        if "__month" in doc_id or field_bool(doc, "_deleted") or not field_bool(doc, "_full"):
+            continue
+        if field_str(doc, "youtubeLink"):
+            continue
+        ds = field_str(doc, "changedDate") or field_str(doc, "dateStr")
+        m = re.findall(r"\d+", ds)
+        if len(m) < 3:
+            continue
+        key = f"{int(m[0])}-{int(m[1])}-{int(m[2])}"
+        vid = by_date.get(key)
+        if not vid:
+            continue
+        # Firestoreへ youtubeLink をパッチ
+        url = (f"https://firestore.googleapis.com/v1/projects/{PROJECT_ID}"
+               f"/databases/(default)/documents/edits/{doc_id}"
+               f"?updateMask.fieldPaths=youtubeLink&updateMask.fieldPaths=updatedBy")
+        body = json.dumps({"fields": {
+            "youtubeLink": {"stringValue": f"https://youtu.be/{vid}"},
+            "updatedBy": {"stringValue": "auto-link"},
+        }}).encode()
+        req = urllib.request.Request(url, data=body, method="PATCH", headers={
+            "Authorization": f"Bearer {id_token}",
+            "Content-Type": "application/json",
+        })
+        try:
+            urllib.request.urlopen(req, timeout=20).read()
+            print(f"リンク自動記入: {doc_id} → https://youtu.be/{vid}")
+            filled += 1
+        except Exception as e:
+            print(f"  WARNING: リンク記入失敗 {doc_id}: {e}", file=sys.stderr)
+    return filled
+
+
 def main():
     email = os.environ.get("FIREBASE_BOT_EMAIL", "").strip()
     password = os.environ.get("FIREBASE_BOT_PASSWORD", "").strip()
@@ -108,6 +165,10 @@ def main():
     id_token = firebase_login(email, password)
     docs = list_edits(id_token)
     print(f"Firestore: {len(docs)} 件のドキュメントを取得")
+
+    filled = autofill_youtube_links(id_token, docs)
+    if filled:
+        docs = list_edits(id_token)  # リンク記入後の最新状態で続行
 
     os.makedirs(THUMB_DIR, exist_ok=True)
     created = 0

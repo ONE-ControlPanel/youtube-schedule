@@ -709,9 +709,10 @@ function renderDashboard(key) {
     var changed = r.changedDate && r.origDate && r.changedDate!==r.dateStr;
     var changedMark = changed ? '<span class="changed-badge">&#10149; 日付変更</span>' : '';
     // サムネプレビュー（優先度: 納品サムネのキャッシュ > YouTube実サムネ > サムネ画像案）
-    var thumbCands = ['data/thumbs/' + key + '_' + r.no + '.jpg'];
+    var thumbCands = [];
     var ytm = (r.youtubeLink||'').match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/)([\w-]{11})/);
     if (ytm) thumbCands.push('https://i.ytimg.com/vi/' + ytm[1] + '/mqdefault.jpg');
+    thumbCands.push('data/thumbs/' + key + '_' + r.no + '.jpg');
     var tsrc = (r.thumbIdea||'') + ' ' + (r.thumbUrl||'');
     var gy = tsrc.match(/gyazo\.com\/([a-z0-9]{10,})/i);
     if (gy) thumbCands.push('https://i.gyazo.com/' + gy[1] + '.jpg', 'https://i.gyazo.com/' + gy[1] + '.png', 'https://i.gyazo.com/thumb/1000/' + gy[1] + '-heic.jpg');
