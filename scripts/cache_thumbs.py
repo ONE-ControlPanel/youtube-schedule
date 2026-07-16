@@ -32,8 +32,16 @@ def firebase_login(email: str, password: str) -> str:
     url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}"
     payload = json.dumps({"email": email, "password": password, "returnSecureToken": True}).encode()
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        return json.loads(resp.read().decode())["idToken"]
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            return json.loads(resp.read().decode())["idToken"]
+    except urllib.error.HTTPError as e:
+        try:
+            reason = json.loads(e.read().decode()).get("error", {}).get("message", "")
+        except Exception:
+            reason = ""
+        print(f"ERROR: Firebaseログイン失敗 ({reason}) - FIREBASE_BOT_EMAIL/PASSWORD を確認してください", file=sys.stderr)
+        sys.exit(1)
 
 
 def list_edits(id_token: str) -> list:
