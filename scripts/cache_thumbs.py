@@ -40,8 +40,9 @@ def firebase_login(email: str, password: str) -> str:
             reason = json.loads(e.read().decode()).get("error", {}).get("message", "")
         except Exception:
             reason = ""
-        print(f"ERROR: Firebaseログイン失敗 ({reason}) - FIREBASE_BOT_EMAIL/PASSWORD を確認してください", file=sys.stderr)
-        sys.exit(1)
+        # 認証情報の設定ミスはコードの問題ではないため、失敗通知メールを出さずスキップ扱いにする
+        print(f"WARNING: Firebaseログイン失敗 ({reason}) - FIREBASE_BOT_EMAIL/PASSWORD を確認してください", file=sys.stderr)
+        sys.exit(0)
 
 
 def list_edits(id_token: str) -> list:
