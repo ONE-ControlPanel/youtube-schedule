@@ -170,6 +170,9 @@ def main():
         print("FIREBASE_BOT_EMAIL / FIREBASE_BOT_PASSWORD が未設定のためスキップします。")
         sys.exit(0)
 
+    # 診断: 登録値の形式を確認（値そのものは出さない）
+    masked = email[:2] + "***" + (email[email.find("@"):] if "@" in email else "(@なし!)")
+    print(f"診断: EMAIL={masked} (長さ{len(email)}) / PASSWORD 長さ={len(password)}文字")
     id_token = firebase_login(email, password)
     docs = list_edits(id_token)
     print(f"Firestore: {len(docs)} 件のドキュメントを取得")
