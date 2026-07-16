@@ -709,17 +709,17 @@ function renderDashboard(key) {
     var changed = r.changedDate && r.origDate && r.changedDate!==r.dateStr;
     var changedMark = changed ? '<span class="changed-badge">&#10149; 日付変更</span>' : '';
     // サムネプレビュー（YouTubeの実サムネを最優先 → サムネ画像案のGyazo/画像直リンク）
-    var thumbSrc = '';
+    var thumbSrc = '', thumbAlt = '';
     var ytm = (r.youtubeLink||'').match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/)([\w-]{11})/);
     if (ytm) thumbSrc = 'https://i.ytimg.com/vi/' + ytm[1] + '/mqdefault.jpg';
     else {
       var tsrc = (r.thumbIdea||'') + ' ' + (r.thumbUrl||'');
       var gy = tsrc.match(/gyazo\.com\/([a-z0-9]{10,})/i);
-      if (gy) thumbSrc = 'https://i.gyazo.com/' + gy[1] + '.jpg';
+      if (gy) { thumbSrc = 'https://i.gyazo.com/' + gy[1] + '.jpg'; thumbAlt = 'https://i.gyazo.com/' + gy[1] + '.png|https://i.gyazo.com/thumb/1000/' + gy[1] + '-heic.jpg'; }
       else { var im = tsrc.match(/https?:\/\/[^\s"']+\.(?:png|jpe?g|gif|webp)/i); if (im) thumbSrc = im[0]; }
     }
     var thumbCell = thumbSrc
-      ? '<img src="'+thumbSrc+'" onerror="if(!this.dataset.p){this.dataset.p=1;this.src=this.src.replace(/\.jpg$/,\'.png\');}else{this.style.display=\'none\';}" style="width:72px;height:40px;object-fit:cover;border-radius:5px;display:block;">'
+      ? '<img src="'+thumbSrc+'" data-alt="'+thumbAlt+'" onerror="var a=(this.dataset.alt||\'\').split(\'|\').filter(Boolean);if(a.length){this.src=a.shift();this.dataset.alt=a.join(\'|\');}else{this.style.display=\'none\';}" style="width:72px;height:40px;object-fit:cover;border-radius:5px;display:block;">'
       : '<span style="color:var(--text-dim)">&#8212;</span>';
     var noteHtml = r.notes ? '<div style="font-size:10px;color:var(--accent4);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px;" title="'+r.notes.replace(/"/g,'&quot;')+'">&#128221; '+r.notes.slice(0,40)+(r.notes.length>40?'…':'')+'</div>' : '';
     var lb = function(url, label){
@@ -908,7 +908,7 @@ function showDetail(key, no) {
     var preview = '';
     var gy = url.match(/gyazo\.com\/([a-z0-9]+)/i);
     if (gy) {
-      preview = '<img src="https://i.gyazo.com/'+gy[1]+'.png" loading="lazy" onerror="var s=[\'jpg\',\'gif\',\'webp\'];this.dataset.i=(+this.dataset.i||0);if(this.dataset.i<s.length){this.src=\'https://i.gyazo.com/'+gy[1]+'.\'+s[this.dataset.i++];}else{this.style.display=\'none\';}" style="max-width:100%;max-height:220px;border-radius:8px;margin-top:8px;border:1px solid var(--border);display:block;">';
+      preview = '<img src="https://i.gyazo.com/'+gy[1]+'.png" onerror="var s=[\'https://i.gyazo.com/'+gy[1]+'.jpg\',\'https://i.gyazo.com/thumb/1000/'+gy[1]+'-heic.jpg\'];this.dataset.i=(+this.dataset.i||0);if(this.dataset.i<s.length){this.src=s[this.dataset.i++];}else{this.style.display=\'none\';}" style="max-width:100%;max-height:220px;border-radius:8px;margin-top:8px;border:1px solid var(--border);display:block;">';
     } else if (/\.(png|jpe?g|gif|webp|bmp)(\?|$)/i.test(url)) {
       preview = '<img src="'+url+'" loading="lazy" onerror="this.style.display=\'none\'" style="max-width:100%;max-height:220px;border-radius:8px;margin-top:8px;border:1px solid var(--border);display:block;">';
     }
@@ -1381,5 +1381,5 @@ var CSV_MAY = ',,,,,,,,,,,,,,,,,,\n' +
     });
   });
 })();</script>
-<script src="firebase-addon.js?v=8"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=3"></script><script src="firestore-data-addon.js?v=2"></script><script src="ui-enhance-addon.js?v=1"></script></body>
+<script src="firebase-addon.js?v=9"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=3"></script><script src="firestore-data-addon.js?v=2"></script><script src="ui-enhance-addon.js?v=1"></script></body>
 </html>
