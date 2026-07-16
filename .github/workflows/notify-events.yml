@@ -40,11 +40,20 @@ jobs:
           YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
         run: python scripts/notify_events.py
 
+      - name: サムネ納品URLの画像をキャッシュ
+        env:
+          FIREBASE_BOT_EMAIL: ${{ secrets.FIREBASE_BOT_EMAIL }}
+          FIREBASE_BOT_PASSWORD: ${{ secrets.FIREBASE_BOT_PASSWORD }}
+        run: |
+          pip install --quiet pillow
+          python scripts/cache_thumbs.py
+
       - name: 通知済み記録をコミット
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/notify_state.json
+          if [ -d data/thumbs ]; then git add data/thumbs; fi
           if git diff --staged --quiet; then
             echo "変更なし - スキップ"
           else

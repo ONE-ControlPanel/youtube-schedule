@@ -708,16 +708,16 @@ function renderDashboard(key) {
     var todayMark = isToday ? '<span class="today-marker">TODAY</span>' : '';
     var changed = r.changedDate && r.origDate && r.changedDate!==r.dateStr;
     var changedMark = changed ? '<span class="changed-badge">&#10149; 日付変更</span>' : '';
-    // サムネプレビュー（YouTubeの実サムネを最優先 → サムネ画像案のGyazo/画像直リンク）
-    var thumbSrc = '', thumbAlt = '';
+    // サムネプレビュー（優先度: 納品サムネのキャッシュ > YouTube実サムネ > サムネ画像案）
+    var thumbCands = ['data/thumbs/' + key + '_' + r.no + '.jpg'];
     var ytm = (r.youtubeLink||'').match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/)([\w-]{11})/);
-    if (ytm) thumbSrc = 'https://i.ytimg.com/vi/' + ytm[1] + '/mqdefault.jpg';
-    else {
-      var tsrc = (r.thumbIdea||'') + ' ' + (r.thumbUrl||'');
-      var gy = tsrc.match(/gyazo\.com\/([a-z0-9]{10,})/i);
-      if (gy) { thumbSrc = 'https://i.gyazo.com/' + gy[1] + '.jpg'; thumbAlt = 'https://i.gyazo.com/' + gy[1] + '.png|https://i.gyazo.com/thumb/1000/' + gy[1] + '-heic.jpg'; }
-      else { var im = tsrc.match(/https?:\/\/[^\s"']+\.(?:png|jpe?g|gif|webp)/i); if (im) thumbSrc = im[0]; }
-    }
+    if (ytm) thumbCands.push('https://i.ytimg.com/vi/' + ytm[1] + '/mqdefault.jpg');
+    var tsrc = (r.thumbIdea||'') + ' ' + (r.thumbUrl||'');
+    var gy = tsrc.match(/gyazo\.com\/([a-z0-9]{10,})/i);
+    if (gy) thumbCands.push('https://i.gyazo.com/' + gy[1] + '.jpg', 'https://i.gyazo.com/' + gy[1] + '.png', 'https://i.gyazo.com/thumb/1000/' + gy[1] + '-heic.jpg');
+    else { var im = tsrc.match(/https?:\/\/[^\s"']+\.(?:png|jpe?g|gif|webp)/i); if (im) thumbCands.push(im[0]); }
+    var thumbSrc = thumbCands.shift();
+    var thumbAlt = thumbCands.join('|');
     var thumbCell = thumbSrc
       ? '<img src="'+thumbSrc+'" data-alt="'+thumbAlt+'" onerror="var a=(this.dataset.alt||\'\').split(\'|\').filter(Boolean);if(a.length){this.src=a.shift();this.dataset.alt=a.join(\'|\');}else{this.style.display=\'none\';}" style="width:72px;height:40px;object-fit:cover;border-radius:5px;display:block;">'
       : '<span style="color:var(--text-dim)">&#8212;</span>';
