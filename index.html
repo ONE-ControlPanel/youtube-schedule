@@ -710,6 +710,7 @@ function renderDashboard(key) {
     var changedMark = changed ? '<span class="changed-badge">&#10149; 日付変更</span>' : '';
     // サムネプレビュー（優先度: 納品サムネのキャッシュ > YouTube実サムネ > サムネ画像案）
     var thumbCands = [];
+    if (r.thumbData && r.thumbData.indexOf('data:image') === 0) thumbCands.push(r.thumbData);
     var ytm = (r.youtubeLink||'').match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/)([\w-]{11})/);
     if (ytm) thumbCands.push('https://i.ytimg.com/vi/' + ytm[1] + '/mqdefault.jpg');
     thumbCands.push('data/thumbs/' + key + '_' + r.no + '.jpg');
@@ -1382,5 +1383,5 @@ var CSV_MAY = ',,,,,,,,,,,,,,,,,,\n' +
     });
   });
 })();</script>
-<script src="firebase-addon.js?v=9"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=3"></script><script src="firestore-data-addon.js?v=2"></script><script src="ui-enhance-addon.js?v=1"></script></body>
+<script src="firebase-addon.js?v=9"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=3"></script><script src="firestore-data-addon.js?v=3"></script><script src="ui-enhance-addon.js?v=2"></script></body>
 </html>
