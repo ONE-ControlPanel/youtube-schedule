@@ -242,16 +242,29 @@
     try {
       if (!fb() || !fb().auth || !fb().apps || !fb().apps.length){ setTimeout(boot, 500); return; }
     } catch(e){ setTimeout(boot, 500); return; }
-    fb().auth().onAuthStateChanged(function(user){
-      if (!user || MODE) return;
+    var checking = false;
+    function checkMode(retry){
+      if (MODE || checking) return;
+      checking = true;
       db().collection('edits').where('_full','==',true).limit(1).get().then(function(snap){
+        checking = false;
+        if (MODE) return;
         if (!snap.empty){
           startFirestoreMode();
         } else {
           MODE = 'sheet';
           console.log('[firestore-data] シートモード（移行するには migrateToFirestore() を実行）');
         }
-      }).catch(function(e){ console.error('[firestore-data] mode check failed:', e); });
+      }).catch(function(e){
+        checking = false;
+        console.error('[firestore-data] mode check failed (retry ' + retry + '):', e);
+        // 通信失敗時は少し待って再試行（画面が空のままになるのを防ぐ）
+        if (retry < 5) setTimeout(function(){ checkMode(retry + 1); }, 3000);
+      });
+    }
+    fb().auth().onAuthStateChanged(function(user){
+      if (!user) return;
+      checkMode(0);
     });
   }
   boot();
