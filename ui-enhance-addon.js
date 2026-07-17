@@ -1,7 +1,7 @@
 // ui-enhance-addon.js - 編集パネルのURL入力欄に「開く」ボタンを追加
 // 編集モード中でも、入力されているURLをワンクリックで開けるようにする。
 ;(function(){
-  var URL_KEYS = ['deliveryUrl','reviewUrl','materialUrl1','materialUrl2','thumbUrl','youtubeLink'];
+  var URL_KEYS = ['deliveryUrl','reviewUrl','materialUrl1','materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','youtubeLink'];
 
   function enhancePanel(){
     var panel = document.getElementById('fb-edit-panel');
@@ -33,6 +33,44 @@
       wrap.appendChild(btn);
     });
     if (found) panel.dataset.uiEnh = '1';
+  }
+
+  // ---------- 素材URL②〜⑤: 空欄は隠して「＋追加」で順次表示 ----------
+  var EXTRA_MATERIALS = ['materialUrl2','materialUrl3','materialUrl4','materialUrl5'];
+
+  function setupMaterialRows(){
+    var panel = document.getElementById('fb-edit-panel');
+    if (!panel || panel.dataset.matEnh === '1') return;
+    var rows = [];
+    EXTRA_MATERIALS.forEach(function(key){
+      var input = document.getElementById('fb-edit-ext-' + key);
+      if (!input) return;
+      var row = input.closest('.fb-edit-row');
+      if (row) rows.push({ row: row, input: input });
+    });
+    if (!rows.length) return;
+    panel.dataset.matEnh = '1';
+
+    // 空欄の行は隠す
+    rows.forEach(function(o){ if (!o.input.value.trim()) o.row.style.display = 'none'; });
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = '＋ 素材URLを追加';
+    btn.style.cssText = 'margin:2px 0 10px;padding:7px 14px;background:transparent;border:1px dashed var(--border,#555);border-radius:8px;color:var(--text-muted,#999);font-size:11px;cursor:pointer;font-family:"Noto Sans JP",sans-serif;';
+    function refreshBtn(){
+      var hidden = rows.filter(function(o){ return o.row.style.display === 'none'; });
+      btn.style.display = hidden.length ? '' : 'none';
+    }
+    btn.addEventListener('click', function(ev){
+      ev.preventDefault(); ev.stopPropagation();
+      var next = rows.find(function(o){ return o.row.style.display === 'none'; });
+      if (next){ next.row.style.display = ''; next.input.focus(); }
+      refreshBtn();
+    });
+    var lastRow = rows[rows.length - 1].row;
+    lastRow.parentNode.insertBefore(btn, lastRow.nextSibling);
+    refreshBtn();
   }
 
   // ---------- サムネ画像の貼り付けゾーン ----------
@@ -156,6 +194,6 @@
   }
 
   // 編集パネルは動的に生成されるので出現を監視する
-  var mo = new MutationObserver(function(){ enhancePanel(); try { injectPasteZone(); } catch(e){} });
+  var mo = new MutationObserver(function(){ enhancePanel(); try { setupMaterialRows(); } catch(e){} try { injectPasteZone(); } catch(e){} });
   mo.observe(document.body, { childList: true, subtree: true });
 })();
