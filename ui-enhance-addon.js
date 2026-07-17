@@ -1,7 +1,7 @@
 // ui-enhance-addon.js - 編集パネルのURL入力欄に「開く」ボタンを追加
 // 編集モード中でも、入力されているURLをワンクリックで開けるようにする。
 ;(function(){
-  var URL_KEYS = ['deliveryUrl','reviewUrl','materialUrl1','materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','youtubeLink'];
+  var URL_KEYS = ['deliveryUrl','reviewUrl','materialUrl1','materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','imageIdeaUrl','thumbMaterialUrl','youtubeLink'];
 
   function enhancePanel(){
     var panel = document.getElementById('fb-edit-panel');
@@ -71,6 +71,38 @@
     var lastRow = rows[rows.length - 1].row;
     lastRow.parentNode.insertBefore(btn, lastRow.nextSibling);
     refreshBtn();
+  }
+
+  // ---------- イメージ画像のライブプレビュー ----------
+  function imgCandidates(url){
+    var gy = url.match(/gyazo\.com\/([a-z0-9]{10,})/i);
+    if (gy) return ['https://i.gyazo.com/'+gy[1]+'.png', 'https://i.gyazo.com/'+gy[1]+'.jpg', 'https://i.gyazo.com/thumb/1000/'+gy[1]+'-heic.jpg'];
+    if (/\.(png|jpe?g|gif|webp|bmp)(\?|$)/i.test(url)) return [url];
+    return [url];  // 一応試す（読めなければ非表示）
+  }
+
+  function setupImagePreview(){
+    var input = document.getElementById('fb-edit-ext-imageIdeaUrl');
+    if (!input || input.dataset.prevEnh === '1') return;
+    input.dataset.prevEnh = '1';
+    var row = input.closest('.fb-edit-row') || input.parentNode;
+    var img = document.createElement('img');
+    img.id = 'image-idea-preview';
+    img.style.cssText = 'display:none;max-width:100%;max-height:200px;border-radius:8px;margin:6px 0 10px;border:1px solid var(--border,#444);';
+    row.parentNode.insertBefore(img, row.nextSibling);
+
+    function update(){
+      var url = input.value.trim();
+      if (!url){ img.style.display = 'none'; return; }
+      var cands = imgCandidates(url);
+      var i = 0;
+      img.onerror = function(){ i++; if (i < cands.length){ img.src = cands[i]; } else { img.style.display = 'none'; } };
+      img.onload = function(){ img.style.display = 'block'; };
+      img.src = cands[0];
+    }
+    input.addEventListener('change', update);
+    input.addEventListener('paste', function(){ setTimeout(update, 50); });
+    update();
   }
 
   // ---------- サムネ画像の貼り付けゾーン ----------
@@ -194,6 +226,6 @@
   }
 
   // 編集パネルは動的に生成されるので出現を監視する
-  var mo = new MutationObserver(function(){ enhancePanel(); try { setupMaterialRows(); } catch(e){} try { injectPasteZone(); } catch(e){} });
+  var mo = new MutationObserver(function(){ enhancePanel(); try { setupMaterialRows(); } catch(e){} try { setupImagePreview(); } catch(e){} try { injectPasteZone(); } catch(e){} });
   mo.observe(document.body, { childList: true, subtree: true });
 })();

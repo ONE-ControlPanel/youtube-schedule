@@ -20,7 +20,7 @@
   // ---------- 行データ <-> Firestoreドキュメント ----------
   var FIELDS = ['dateStr','changedDate','title','videoStaff','thumbStaff','videoCheck',
                 'thumbCheck','reserved','deliveryUrl','reviewUrl','materialUrl1',
-                'materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','thumbIdea','thumbData','youtubeLink','notes'];
+                'materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','thumbIdea','thumbData','imageIdeaUrl','thumbMaterialUrl','youtubeLink','notes'];
 
   function docToRow(id, d){
     var us = id.indexOf('_');
@@ -36,6 +36,24 @@
         r.date.setHours(0,0,0,0);
         r.weekday = ['日','月','火','水','木','金','土'][r.date.getDay()];
       }
+    }
+    // 旧「サムネ画像案」のテキストから イメージ画像/サムネ素材 URLを引き継ぐ
+    if ((!r.imageIdeaUrl || !r.thumbMaterialUrl) && r.thumbIdea){
+      var cur = '';
+      String(r.thumbIdea).split(/\n/).forEach(function(line){
+        var urls = line.match(/https?:\/\/[^\s]+/g);
+        if (!urls){
+          if (line.indexOf('イメージ') !== -1) cur = 'image';
+          else if (line.indexOf('素材') !== -1) cur = 'material';
+          return;
+        }
+        urls.forEach(function(u){
+          if (cur === 'image' && !r.imageIdeaUrl) r.imageIdeaUrl = u;
+          else if (cur === 'material' && !r.thumbMaterialUrl) r.thumbMaterialUrl = u;
+          else if (!r.imageIdeaUrl) r.imageIdeaUrl = u;
+          else if (!r.thumbMaterialUrl) r.thumbMaterialUrl = u;
+        });
+      });
     }
     return r;
   }
