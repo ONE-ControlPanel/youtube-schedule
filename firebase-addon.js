@@ -303,7 +303,6 @@
     {key:'materialUrl1', label:'素材URL①', type:'text'},
     {key:'materialUrl2', label:'素材URL②', type:'text'},
     {key:'thumbUrl', label:'サムネ納品URL', type:'text'},
-    {key:'thumbIdea', label:'サムネ画像案', type:'textarea'},
     {key:'youtubeLink', label:'YouTubeリンク', type:'text'}
   ];
   var curKey=null, curNo=null;

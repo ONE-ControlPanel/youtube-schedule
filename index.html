@@ -714,7 +714,7 @@ function renderDashboard(key) {
     var ytm = (r.youtubeLink||'').match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/)([\w-]{11})/);
     if (ytm) thumbCands.push('https://i.ytimg.com/vi/' + ytm[1] + '/mqdefault.jpg');
     thumbCands.push('data/thumbs/' + key + '_' + r.no + '.jpg');
-    var tsrc = (r.thumbIdea||'') + ' ' + (r.thumbUrl||'');
+    var tsrc = (r.thumbUrl||'');
     var gy = tsrc.match(/gyazo\.com\/([a-z0-9]{10,})/i);
     if (gy) thumbCands.push('https://i.gyazo.com/' + gy[1] + '.jpg', 'https://i.gyazo.com/' + gy[1] + '.png', 'https://i.gyazo.com/thumb/1000/' + gy[1] + '-heic.jpg');
     else { var im = tsrc.match(/https?:\/\/[^\s"']+\.(?:png|jpe?g|gif|webp)/i); if (im) thumbCands.push(im[0]); }
@@ -954,7 +954,6 @@ function showDetail(key, no) {
     link('動画納品URL',r.deliveryUrl) + link('校正依頼URL',r.reviewUrl) +
     link('素材URL①',r.materialUrl1) + link('素材URL②',r.materialUrl2) +
     link('サムネ納品URL',r.thumbUrl) + link('YouTubeリンク',r.youtubeLink) +
-    (r.thumbIdea?'<div class="modal-section"><div class="modal-section-label">サムネ画像案</div><div class="modal-section-value" style="font-size:11px;line-height:1.6;white-space:pre-wrap;color:var(--text-muted)">'+r.thumbIdea+'</div></div>':'') +
     '<div class="divider"></div>' +
     buildYtActionHtml(r);
   document.getElementById('modal-overlay').classList.add('open');
@@ -1383,5 +1382,5 @@ var CSV_MAY = ',,,,,,,,,,,,,,,,,,\n' +
     });
   });
 })();</script>
-<script src="firebase-addon.js?v=9"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=3"></script><script src="firestore-data-addon.js?v=3"></script><script src="ui-enhance-addon.js?v=2"></script></body>
+<script src="firebase-addon.js?v=10"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=3"></script><script src="firestore-data-addon.js?v=3"></script><script src="ui-enhance-addon.js?v=2"></script></body>
 </html>
