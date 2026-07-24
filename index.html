@@ -945,17 +945,8 @@ function showDetail(key, no) {
     '<div class="modal-date">'+dateDisp+(origDisp?'<span style="font-size:10px;color:var(--text-dim);margin-left:8px">元: '+origDisp+'</span>':'')+'</div>' +
     '<div class="modal-title">'+(r.title||'タイトル未設定')+'</div>' +
     statusBadge(s) +
-    '<div class="divider"></div>' +
-    '<div class="modal-grid"><div class="modal-section"><div class="modal-section-label">動画担当</div><div class="modal-section-value">'+(r.videoStaff||'&#8212;')+'</div></div>' +
-    '<div class="modal-section"><div class="modal-section-label">サムネ担当</div><div class="modal-section-value">'+(r.thumbStaff||'&#8212;')+'</div></div></div>' +
-    clHtml +
-    (r.notes?'<div class="modal-section"><div class="modal-section-label">共有事項</div><div class="modal-section-value" style="font-size:12px;line-height:1.7;white-space:pre-wrap;color:var(--text-muted)">'+r.notes+'</div></div>':'') +
-    '<div class="divider"></div>' +
-    link('初稿動画URL',r.draftVideoUrl) + link('納品動画URL',r.deliveryUrl) + link('校正依頼URL',r.reviewUrl) +
-    link('素材URL①',r.materialUrl1) + link('素材URL②',r.materialUrl2) +
-    link('素材URL③',r.materialUrl3) + link('素材URL④',r.materialUrl4) + link('素材URL⑤',r.materialUrl5) +
-    (r.imageIdeaData && r.imageIdeaData.indexOf('data:image')===0 ? '<div class="modal-section"><div class="modal-section-label">サムネイメージ画像</div><img src="'+r.imageIdeaData+'" style="max-width:100%;max-height:220px;border-radius:8px;border:1px solid var(--border);display:block;"></div>' : link('サムネイメージ画像',r.imageIdeaUrl)) +
-    link('サムネ素材',r.thumbMaterialUrl) + link('サムネ初稿納品URL',r.thumbUrl) + link('YouTubeリンク',r.youtubeLink) +
+    // 進捗チェックは非表示で生成し、依頼欄/納品欄/完了欄の左側へ移動して表示する
+    '<div style="display:none">' + clHtml + '</div>' +
     '<div class="divider"></div>' +
     buildYtActionHtml(r);
   document.getElementById('modal-overlay').classList.add('open');
