@@ -4,7 +4,7 @@
 // ・画像貼り付けゾーン（サムネイメージ画像 imageIdeaData / 納品サムネ thumbData）
 // ・依頼欄／納品欄／完了欄の3セクション構成（左側に進捗チェック）
 ;(function(){
-  var URL_KEYS = ['deliveryUrl','reviewUrl','draftVideoUrl','materialUrl1','materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','imageIdeaUrl','thumbMaterialUrl','youtubeLink'];
+  var URL_KEYS = ['deliveryUrl','reviewUrl','draftVideoUrl','fixedVideoUrl','materialUrl1','materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','imageIdeaUrl','thumbMaterialUrl','youtubeLink'];
 
   function currentRow(){
     var key = window.__fbCurKey, no = window.__fbCurNo;
@@ -287,7 +287,7 @@
     var panel = document.getElementById('fb-edit-panel');
     if (!panel || panel.dataset.sect === '1') return;
     // 必要なパーツが揃うまで待つ（Observerが再度呼ぶ）
-    var need = ['materialUrl1','imageIdeaUrl','thumbMaterialUrl','draftVideoUrl','deliveryUrl','thumbUrl','youtubeLink'];
+    var need = ['materialUrl1','imageIdeaUrl','thumbMaterialUrl','draftVideoUrl','fixedVideoUrl','deliveryUrl','thumbUrl','youtubeLink'];
     for (var i = 0; i < need.length; i++){ if (!rowOf(need[i])) return; }
     var addBtn = document.getElementById('add-material-btn');
     var zoneA = document.getElementById('image-idea-zone');
@@ -314,6 +314,7 @@
 
     // 納品欄
     s2.right.appendChild(rowOf('draftVideoUrl'));
+    s2.right.appendChild(rowOf('fixedVideoUrl'));
     s2.right.appendChild(rowOf('deliveryUrl'));
     s2.right.appendChild(rowOf('thumbUrl'));
     s2.right.appendChild(zoneB);
