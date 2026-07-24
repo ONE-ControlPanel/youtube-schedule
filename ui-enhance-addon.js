@@ -252,6 +252,37 @@
     return { sec: sec, left: left, right: right };
   }
 
+  // 依頼済みチェックON時のChatWork自動報告（GAS中継経由）
+  var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxwAGzj3rHMJGDdHB8PB5eK8yi9c6riZJ2lVun-4jHsZNBjHQHWFx-5Ei5eP5hOMwHqmQ/exec';
+
+  function toastMsg(m){
+    if (typeof window.showToast === 'function') window.showToast(m);
+    else alert(m);
+  }
+
+  function sendRequestReport(){
+    var r = currentRow();
+    if (!r) return;
+    var md = '?', wd = '';
+    if (r.date){
+      md = (r.date.getMonth()+1) + '/' + r.date.getDate();
+      wd = '(' + ['日','月','火','水','木','金','土'][r.date.getDay()] + ')';
+    }
+    var msg = '【依頼｜かずさんのYouTube】\n' + md + wd + '動画・サムネ素材アップ完了！\n担当者に依頼をお願いします！';
+    if (!confirm('以下の内容でChatWorkに送信します：\n\n' + msg)) return;
+    fetch(GAS_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({ message: msg })
+    })
+      .then(function(res){ return res.json(); })
+      .then(function(j){
+        if (j && j.status === 200) toastMsg('✓ ChatWorkへ依頼報告を送信しました');
+        else throw new Error('status ' + (j && j.status));
+      })
+      .catch(function(e){ alert('ChatWork送信に失敗しました: ' + e.message); });
+  }
+
   function makeRequestCheck(){
     var r = currentRow() || {};
     var on = r.requestDone === 'TRUE';
@@ -267,6 +298,7 @@
       on = !on;
       render();
       saveField('requestDone', on ? 'TRUE' : '');
+      if (on) sendRequestReport();  // ONにしたときだけCWへ自動報告
     });
     return d;
   }
