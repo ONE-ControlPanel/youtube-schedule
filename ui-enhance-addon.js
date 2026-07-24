@@ -1,8 +1,18 @@
-// ui-enhance-addon.js - 編集パネルのURL入力欄に「開く」ボタンを追加
-// 編集モード中でも、入力されているURLをワンクリックで開けるようにする。
+// ui-enhance-addon.js - 編集パネルのUI強化
+// ・URL入力欄に「開く」ボタン
+// ・素材URL②〜⑤は空なら非表示、「＋追加」で順次表示
+// ・サムネイメージ画像の貼り付けゾーン（imageIdeaData）
+// ・納品サムネの貼り付けゾーン（thumbData: 一覧のサムネに最優先表示）
 ;(function(){
   var URL_KEYS = ['deliveryUrl','reviewUrl','materialUrl1','materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','imageIdeaUrl','thumbMaterialUrl','youtubeLink'];
 
+  function currentRow(){
+    var key = window.__fbCurKey, no = window.__fbCurNo;
+    if (!key || no == null || !window.months || !window.months[key]) return null;
+    return window.months[key].rows.find(function(r){ return r.no === no; }) || null;
+  }
+
+  // ---------- URL入力欄の「開く」ボタン ----------
   function enhancePanel(){
     var panel = document.getElementById('fb-edit-panel');
     if (!panel || panel.dataset.uiEnh === '1') return;
@@ -12,7 +22,6 @@
       if (!input || input.dataset.uiEnh === '1') return;
       input.dataset.uiEnh = '1';
       found = true;
-      // 入力欄とボタンを横並びにする
       var wrap = document.createElement('div');
       wrap.style.cssText = 'display:flex;gap:6px;align-items:center;';
       input.parentNode.insertBefore(wrap, input);
@@ -51,10 +60,10 @@
     if (!rows.length) return;
     panel.dataset.matEnh = '1';
 
-    // 空欄の行は隠す
     rows.forEach(function(o){ if (!o.input.value.trim()) o.row.style.display = 'none'; });
 
     var btn = document.createElement('button');
+    btn.id = 'add-material-btn';
     btn.type = 'button';
     btn.textContent = '＋ 素材URLを追加';
     btn.style.cssText = 'margin:2px 0 10px;padding:7px 14px;background:transparent;border:1px dashed var(--border,#555);border-radius:8px;color:var(--text-muted,#999);font-size:11px;cursor:pointer;font-family:"Noto Sans JP",sans-serif;';
@@ -73,62 +82,28 @@
     refreshBtn();
   }
 
-  // ---------- イメージ画像のライブプレビュー ----------
+  // ---------- 画像貼り付けゾーン（共通部品） ----------
   function imgCandidates(url){
     var gy = url.match(/gyazo\.com\/([a-z0-9]{10,})/i);
     if (gy) return ['https://i.gyazo.com/'+gy[1]+'.png', 'https://i.gyazo.com/'+gy[1]+'.jpg', 'https://i.gyazo.com/thumb/1000/'+gy[1]+'-heic.jpg'];
-    if (/\.(png|jpe?g|gif|webp|bmp)(\?|$)/i.test(url)) return [url];
-    return [url];  // 一応試す（読めなければ非表示）
+    return [url];
   }
 
-  function setupImagePreview(){
-    var input = document.getElementById('fb-edit-ext-imageIdeaUrl');
-    if (!input || input.dataset.prevEnh === '1') return;
-    input.dataset.prevEnh = '1';
-    var row = input.closest('.fb-edit-row') || input.parentNode;
-    var img = document.createElement('img');
-    img.id = 'image-idea-preview';
-    img.style.cssText = 'display:none;max-width:100%;max-height:200px;border-radius:8px;margin:6px 0 10px;border:1px solid var(--border,#444);';
-    row.parentNode.insertBefore(img, row.nextSibling);
-
-    function update(){
-      var url = input.value.trim();
-      if (!url){ img.style.display = 'none'; return; }
-      var cands = imgCandidates(url);
-      var i = 0;
-      img.onerror = function(){ i++; if (i < cands.length){ img.src = cands[i]; } else { img.style.display = 'none'; } };
-      img.onload = function(){ img.style.display = 'block'; };
-      img.src = cands[0];
-    }
-    input.addEventListener('change', update);
-    input.addEventListener('paste', function(){ setTimeout(update, 50); });
-    update();
-  }
-
-  // ---------- サムネ画像の貼り付けゾーン ----------
-  function currentRow(){
-    var key = window.__fbCurKey, no = window.__fbCurNo;
-    if (!key || no == null || !window.months || !window.months[key]) return null;
-    return window.months[key].rows.find(function(r){ return r.no === no; }) || null;
-  }
-
-  function saveThumbData(dataUrl, done){
+  function saveField(field, value, done){
     var key = window.__fbCurKey, no = window.__fbCurNo;
     var fb = window.firebase;
     if (!key || no == null || !fb){ alert('保存先が特定できませんでした'); return; }
     var u = fb.auth().currentUser;
-    fb.firestore().collection('edits').doc(key + '_' + no).set({
-      thumbData: dataUrl,
-      updatedAt: fb.firestore.FieldValue.serverTimestamp(),
-      updatedBy: (u && u.email) || 'unknown',
-    }, {merge:true}).then(function(){
+    var patch = { updatedAt: fb.firestore.FieldValue.serverTimestamp(), updatedBy: (u && u.email) || 'unknown' };
+    patch[field] = value;
+    fb.firestore().collection('edits').doc(key + '_' + no).set(patch, {merge:true}).then(function(){
       var r = currentRow();
-      if (r) r.thumbData = dataUrl;
+      if (r) r[field] = value;
       if (done) done(true);
     }).catch(function(e){ alert('保存失敗: ' + e.message); if (done) done(false); });
   }
 
-  function processImageFile(file, zone){
+  function processImageFile(file, zone, cfg){
     var fr = new FileReader();
     fr.onload = function(){
       var img = new Image();
@@ -142,9 +117,9 @@
         var dataUrl = c.toDataURL('image/jpeg', 0.82);
         if (dataUrl.length > 700000){ alert('画像の変換後サイズが大きすぎます'); return; }
         zone.querySelector('.tpz-msg').textContent = '保存中...';
-        saveThumbData(dataUrl, function(ok){
-          if (ok) renderZone(zone, dataUrl);
-          if (ok && typeof window.showToast === 'function') window.showToast('✓ サムネ画像を保存しました');
+        saveField(cfg.field, dataUrl, function(ok){
+          if (ok) renderZone(zone, dataUrl, cfg);
+          if (ok && typeof window.showToast === 'function') window.showToast('✓ ' + cfg.label + 'を保存しました');
         });
       };
       img.onerror = function(){ alert('この画像形式は貼り付けできません（HEICはスクショで貼り付けてください）'); };
@@ -153,40 +128,48 @@
     fr.readAsDataURL(file);
   }
 
-  function renderZone(zone, dataUrl){
+  function renderZone(zone, dataUrl, cfg){
     var prev = zone.querySelector('.tpz-preview');
     var msg = zone.querySelector('.tpz-msg');
     var del = zone.querySelector('.tpz-del');
     if (dataUrl){
-      prev.src = dataUrl; prev.style.display = 'block';
-      msg.textContent = '画像を差し替えるには、ここをクリックして Cmd+V（または画像ファイルをドロップ）';
-      del.style.display = 'inline-block';
+      // data URLは即表示、通常URLはフォールバック候補を順に試す
+      if (dataUrl.indexOf('data:image') === 0){
+        prev.src = dataUrl;
+        prev.style.display = 'block';
+      } else {
+        var cands = imgCandidates(dataUrl), i = 0;
+        prev.onerror = function(){ i++; if (i < cands.length){ prev.src = cands[i]; } else { prev.style.display = 'none'; } };
+        prev.onload = function(){ prev.style.display = 'block'; };
+        prev.src = cands[0];
+      }
+      msg.textContent = '画像を差し替えるには、ここをクリックして Cmd+V（またはドロップ）';
+      del.style.display = (dataUrl.indexOf('data:image') === 0) ? 'inline-block' : 'none';
     } else {
       prev.style.display = 'none';
-      msg.textContent = '📋 ここをクリックして Cmd+V でサムネ画像を貼り付け（ドロップ・クリックで選択も可）';
+      msg.textContent = '📋 ここをクリックして Cmd+V で' + cfg.label + 'を貼り付け（ドロップ・クリックで選択も可）';
       del.style.display = 'none';
     }
   }
 
-  function injectPasteZone(){
-    var panel = document.getElementById('fb-edit-panel');
-    if (!panel || document.getElementById('thumb-paste-zone')) return;
-    var thumbInput = document.getElementById('fb-edit-ext-thumbUrl');
-    if (!thumbInput) return;
-    var row = thumbInput.closest('.fb-edit-row') || thumbInput.parentNode;
+  function makePasteZone(cfg){
+    // cfg: { id, field, label, anchorKey, initial }
+    if (document.getElementById(cfg.id)) return;
+    var anchorInput = document.getElementById('fb-edit-ext-' + cfg.anchorKey);
+    if (!anchorInput) return;
+    var row = anchorInput.closest('.fb-edit-row') || anchorInput.parentNode;
 
     var zone = document.createElement('div');
-    zone.id = 'thumb-paste-zone';
+    zone.id = cfg.id;
     zone.tabIndex = 0;
     zone.style.cssText = 'margin:8px 0 4px;padding:14px;border:2px dashed var(--border,#444);border-radius:10px;text-align:center;cursor:pointer;outline:none;background:var(--surface2,#1a1a28);';
     zone.innerHTML = '<div class="tpz-msg" style="font-size:11px;color:var(--text-muted,#999);line-height:1.6;"></div>' +
-      '<img class="tpz-preview" style="display:none;max-width:100%;max-height:180px;border-radius:8px;margin:8px auto 0;">' +
+      '<img class="tpz-preview" style="display:none;max-width:100%;max-height:200px;border-radius:8px;margin:8px auto 0;">' +
       '<button type="button" class="tpz-del" style="display:none;margin-top:8px;padding:5px 14px;background:transparent;border:1px solid var(--accent,#f36);border-radius:7px;color:var(--accent,#f36);font-size:11px;cursor:pointer;">🗑 貼り付け画像を削除</button>' +
       '<input type="file" class="tpz-file" accept="image/*" style="display:none;">';
     row.parentNode.insertBefore(zone, row.nextSibling);
 
-    var r = currentRow();
-    renderZone(zone, r && r.thumbData && r.thumbData.indexOf('data:image') === 0 ? r.thumbData : '');
+    renderZone(zone, cfg.initial || '', cfg);
 
     zone.addEventListener('focus', function(){ zone.style.borderColor = 'var(--accent2,#7c4dff)'; });
     zone.addEventListener('blur', function(){ zone.style.borderColor = 'var(--border,#444)'; });
@@ -195,7 +178,7 @@
       for (var i = 0; i < items.length; i++){
         if (items[i].type.indexOf('image') === 0){
           ev.preventDefault();
-          processImageFile(items[i].getAsFile(), zone);
+          processImageFile(items[i].getAsFile(), zone, cfg);
           return;
         }
       }
@@ -207,12 +190,12 @@
       ev.preventDefault();
       zone.style.borderColor = 'var(--border,#444)';
       var f = ev.dataTransfer.files[0];
-      if (f && f.type.indexOf('image') === 0) processImageFile(f, zone);
+      if (f && f.type.indexOf('image') === 0) processImageFile(f, zone, cfg);
     });
     zone.addEventListener('click', function(ev){
       if (ev.target.classList.contains('tpz-del')){
-        if (!confirm('貼り付けたサムネ画像を削除しますか？')) return;
-        saveThumbData('', function(ok){ if (ok) renderZone(zone, ''); });
+        if (!confirm('貼り付けた画像を削除しますか？')) return;
+        saveField(cfg.field, '', function(ok){ if (ok) renderZone(zone, '', cfg); });
         return;
       }
       if (ev.target.classList.contains('tpz-preview')) return;
@@ -220,12 +203,37 @@
       zone.querySelector('.tpz-file').click();
     });
     zone.querySelector('.tpz-file').addEventListener('change', function(){
-      if (this.files[0]) processImageFile(this.files[0], zone);
+      if (this.files[0]) processImageFile(this.files[0], zone, cfg);
       this.value = '';
     });
   }
 
-  // 編集パネルは動的に生成されるので出現を監視する
-  var mo = new MutationObserver(function(){ enhancePanel(); try { setupMaterialRows(); } catch(e){} try { setupImagePreview(); } catch(e){} try { injectPasteZone(); } catch(e){} });
+  function injectZones(){
+    var panel = document.getElementById('fb-edit-panel');
+    if (!panel) return;
+    var r = currentRow() || {};
+    // サムネイメージ画像（参考用）: イメージ画像URL欄の下。貼り付け画像 > URLの画像を表示
+    makePasteZone({
+      id: 'image-idea-zone',
+      field: 'imageIdeaData',
+      label: 'サムネイメージ画像',
+      anchorKey: 'imageIdeaUrl',
+      initial: (r.imageIdeaData && r.imageIdeaData.indexOf('data:image') === 0) ? r.imageIdeaData : (r.imageIdeaUrl || ''),
+    });
+    // 納品サムネ: サムネ納品URL欄の下。一覧のサムネに最優先表示される
+    makePasteZone({
+      id: 'thumb-paste-zone',
+      field: 'thumbData',
+      label: '納品サムネ画像',
+      anchorKey: 'thumbUrl',
+      initial: (r.thumbData && r.thumbData.indexOf('data:image') === 0) ? r.thumbData : '',
+    });
+  }
+
+  var mo = new MutationObserver(function(){
+    enhancePanel();
+    try { setupMaterialRows(); } catch(e){}
+    try { injectZones(); } catch(e){}
+  });
   mo.observe(document.body, { childList: true, subtree: true });
 })();

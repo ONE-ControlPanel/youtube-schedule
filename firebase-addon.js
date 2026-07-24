@@ -305,9 +305,9 @@
     {key:'materialUrl3', label:'素材URL③', type:'text'},
     {key:'materialUrl4', label:'素材URL④', type:'text'},
     {key:'materialUrl5', label:'素材URL⑤', type:'text'},
-    {key:'thumbUrl', label:'サムネ納品URL', type:'text'},
-    {key:'imageIdeaUrl', label:'イメージ画像', type:'text'},
+    {key:'imageIdeaUrl', label:'サムネイメージ画像', type:'text'},
     {key:'thumbMaterialUrl', label:'サムネ素材', type:'text'},
+    {key:'thumbUrl', label:'サムネ納品URL', type:'text'},
     {key:'youtubeLink', label:'YouTubeリンク', type:'text'}
   ];
   var curKey=null, curNo=null;

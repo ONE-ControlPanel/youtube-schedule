@@ -20,7 +20,7 @@
   // ---------- 行データ <-> Firestoreドキュメント ----------
   var FIELDS = ['dateStr','changedDate','title','videoStaff','thumbStaff','videoCheck',
                 'thumbCheck','reserved','deliveryUrl','reviewUrl','materialUrl1',
-                'materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','thumbIdea','thumbData','imageIdeaUrl','thumbMaterialUrl','youtubeLink','notes'];
+                'materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','thumbIdea','thumbData','imageIdeaUrl','imageIdeaData','thumbMaterialUrl','youtubeLink','notes'];
 
   function docToRow(id, d){
     var us = id.indexOf('_');
