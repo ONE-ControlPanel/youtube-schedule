@@ -730,7 +730,7 @@ function renderDashboard(key) {
         'style="display:inline-block;margin:1px 2px;padding:2px 7px;font-size:10px;border:1px solid var(--border);border-radius:6px;color:var(--accent2);text-decoration:none;white-space:nowrap;background:var(--surface2);" ' +
         'onmouseover="this.style.borderColor=\'var(--accent2)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'+label+'</a>';
     };
-    var linksCell = lb(r.deliveryUrl,'納品') + lb(r.reviewUrl,'校正') + lb(r.materialUrl1,'素材&#9312;') + lb(r.materialUrl2,'素材&#9313;') + lb(r.materialUrl3,'素材&#9314;') + lb(r.materialUrl4,'素材&#9315;') + lb(r.materialUrl5,'素材&#9316;') + lb(r.thumbUrl,'サムネ') + lb(r.youtubeLink,'&#9654; YT');
+    var linksCell = lb(r.draftVideoUrl,'初稿') + lb(r.deliveryUrl,'納品') + lb(r.reviewUrl,'校正') + lb(r.materialUrl1,'素材&#9312;') + lb(r.materialUrl2,'素材&#9313;') + lb(r.materialUrl3,'素材&#9314;') + lb(r.materialUrl4,'素材&#9315;') + lb(r.materialUrl5,'素材&#9316;') + lb(r.thumbUrl,'サムネ') + lb(r.youtubeLink,'&#9654; YT');
     if (!linksCell) linksCell = '<span style="color:var(--text-dim)">&#8212;</span>';
     return '<tr class="'+trClass+'" onclick="showDetail(\''+key+'\','+r.no+')">' +
       '<td style="font-family:\'Space Mono\';font-size:11px;color:var(--text-muted)">'+r.no+'</td>' +
@@ -951,11 +951,11 @@ function showDetail(key, no) {
     clHtml +
     (r.notes?'<div class="modal-section"><div class="modal-section-label">共有事項</div><div class="modal-section-value" style="font-size:12px;line-height:1.7;white-space:pre-wrap;color:var(--text-muted)">'+r.notes+'</div></div>':'') +
     '<div class="divider"></div>' +
-    link('動画納品URL',r.deliveryUrl) + link('校正依頼URL',r.reviewUrl) +
+    link('初稿動画URL',r.draftVideoUrl) + link('納品動画URL',r.deliveryUrl) + link('校正依頼URL',r.reviewUrl) +
     link('素材URL①',r.materialUrl1) + link('素材URL②',r.materialUrl2) +
     link('素材URL③',r.materialUrl3) + link('素材URL④',r.materialUrl4) + link('素材URL⑤',r.materialUrl5) +
     (r.imageIdeaData && r.imageIdeaData.indexOf('data:image')===0 ? '<div class="modal-section"><div class="modal-section-label">サムネイメージ画像</div><img src="'+r.imageIdeaData+'" style="max-width:100%;max-height:220px;border-radius:8px;border:1px solid var(--border);display:block;"></div>' : link('サムネイメージ画像',r.imageIdeaUrl)) +
-    link('サムネ素材',r.thumbMaterialUrl) + link('サムネ納品URL',r.thumbUrl) + link('YouTubeリンク',r.youtubeLink) +
+    link('サムネ素材',r.thumbMaterialUrl) + link('サムネ初稿納品URL',r.thumbUrl) + link('YouTubeリンク',r.youtubeLink) +
     '<div class="divider"></div>' +
     buildYtActionHtml(r);
   document.getElementById('modal-overlay').classList.add('open');
@@ -1385,5 +1385,5 @@ var CSV_MAY = ',,,,,,,,,,,,,,,,,,\n' +
     });
   });
 })();</script>
-<script src="firebase-addon.js?v=13"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=3"></script><script src="firestore-data-addon.js?v=7"></script><script src="ui-enhance-addon.js?v=5"></script></body>
+<script src="firebase-addon.js?v=14"></script><script src="notify-addon.js?v=1"></script><script src="analytics-addon.js?v=1"></script><script src="report-addon.js?v=3"></script><script src="firestore-data-addon.js?v=8"></script><script src="ui-enhance-addon.js?v=6"></script></body>
 </html>

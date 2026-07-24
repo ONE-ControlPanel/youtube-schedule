@@ -1,15 +1,20 @@
 // ui-enhance-addon.js - 編集パネルのUI強化
 // ・URL入力欄に「開く」ボタン
 // ・素材URL②〜⑤は空なら非表示、「＋追加」で順次表示
-// ・サムネイメージ画像の貼り付けゾーン（imageIdeaData）
-// ・納品サムネの貼り付けゾーン（thumbData: 一覧のサムネに最優先表示）
+// ・画像貼り付けゾーン（サムネイメージ画像 imageIdeaData / 納品サムネ thumbData）
+// ・依頼欄／納品欄／完了欄の3セクション構成（左側に進捗チェック）
 ;(function(){
-  var URL_KEYS = ['deliveryUrl','reviewUrl','materialUrl1','materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','imageIdeaUrl','thumbMaterialUrl','youtubeLink'];
+  var URL_KEYS = ['deliveryUrl','reviewUrl','draftVideoUrl','materialUrl1','materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','imageIdeaUrl','thumbMaterialUrl','youtubeLink'];
 
   function currentRow(){
     var key = window.__fbCurKey, no = window.__fbCurNo;
     if (!key || no == null || !window.months || !window.months[key]) return null;
     return window.months[key].rows.find(function(r){ return r.no === no; }) || null;
+  }
+
+  function rowOf(key){
+    var i = document.getElementById('fb-edit-ext-' + key);
+    return i ? (i.closest('.fb-edit-row') || i.parentNode) : null;
   }
 
   // ---------- URL入力欄の「開く」ボタン ----------
@@ -133,7 +138,6 @@
     var msg = zone.querySelector('.tpz-msg');
     var del = zone.querySelector('.tpz-del');
     if (dataUrl){
-      // data URLは即表示、通常URLはフォールバック候補を順に試す
       if (dataUrl.indexOf('data:image') === 0){
         prev.src = dataUrl;
         prev.style.display = 'block';
@@ -153,7 +157,6 @@
   }
 
   function makePasteZone(cfg){
-    // cfg: { id, field, label, anchorKey, initial }
     if (document.getElementById(cfg.id)) return;
     var anchorInput = document.getElementById('fb-edit-ext-' + cfg.anchorKey);
     if (!anchorInput) return;
@@ -212,7 +215,6 @@
     var panel = document.getElementById('fb-edit-panel');
     if (!panel) return;
     var r = currentRow() || {};
-    // サムネイメージ画像（参考用）: イメージ画像URL欄の下。貼り付け画像 > URLの画像を表示
     makePasteZone({
       id: 'image-idea-zone',
       field: 'imageIdeaData',
@@ -220,7 +222,6 @@
       anchorKey: 'imageIdeaUrl',
       initial: (r.imageIdeaData && r.imageIdeaData.indexOf('data:image') === 0) ? r.imageIdeaData : (r.imageIdeaUrl || ''),
     });
-    // 納品サムネ: サムネ納品URL欄の下。一覧のサムネに最優先表示される
     makePasteZone({
       id: 'thumb-paste-zone',
       field: 'thumbData',
@@ -230,10 +231,109 @@
     });
   }
 
+  // ---------- 依頼欄／納品欄／完了欄のセクション構成 ----------
+  function makeSection(title){
+    var sec = document.createElement('div');
+    sec.className = 'ue-section';
+    sec.style.cssText = 'margin:16px 0;padding:14px;border:1px solid var(--border,#333);border-radius:12px;background:rgba(255,255,255,0.02);';
+    var h = document.createElement('div');
+    h.textContent = title;
+    h.style.cssText = 'font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text,#eee);';
+    sec.appendChild(h);
+    var flex = document.createElement('div');
+    flex.style.cssText = 'display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;';
+    var left = document.createElement('div');
+    left.style.cssText = 'flex:0 0 130px;display:flex;flex-direction:column;gap:8px;min-width:120px;';
+    var right = document.createElement('div');
+    right.style.cssText = 'flex:1;min-width:250px;';
+    flex.appendChild(left);
+    flex.appendChild(right);
+    sec.appendChild(flex);
+    return { sec: sec, left: left, right: right };
+  }
+
+  function makeRequestCheck(){
+    var r = currentRow() || {};
+    var on = r.requestDone === 'TRUE';
+    var d = document.createElement('div');
+    d.style.cssText = 'cursor:pointer;font-size:12px;padding:9px 10px;border:1px solid var(--border,#444);border-radius:8px;user-select:none;text-align:center;font-family:"Noto Sans JP",sans-serif;';
+    function render(){
+      d.textContent = (on ? '✅ ' : '⬜ ') + '依頼済み';
+      d.style.color = on ? 'var(--accent3,#0c6)' : 'var(--text-muted,#999)';
+      d.style.borderColor = on ? 'var(--accent3,#0c6)' : 'var(--border,#444)';
+    }
+    render();
+    d.addEventListener('click', function(){
+      on = !on;
+      render();
+      saveField('requestDone', on ? 'TRUE' : '');
+    });
+    return d;
+  }
+
+  function moveCheckItem(labelText, target){
+    var items = document.querySelectorAll('#modal-body .check-item');
+    for (var i = 0; i < items.length; i++){
+      var lb = items[i].querySelector('.check-label');
+      if (lb && lb.textContent.trim().replace(/^[✓●○\s]+/, '') === labelText){
+        items[i].style.cssText += ';margin:0;';
+        target.appendChild(items[i]);
+        return;
+      }
+    }
+  }
+
+  function restructurePanel(){
+    var panel = document.getElementById('fb-edit-panel');
+    if (!panel || panel.dataset.sect === '1') return;
+    // 必要なパーツが揃うまで待つ（Observerが再度呼ぶ）
+    var need = ['materialUrl1','imageIdeaUrl','thumbMaterialUrl','draftVideoUrl','deliveryUrl','thumbUrl','youtubeLink'];
+    for (var i = 0; i < need.length; i++){ if (!rowOf(need[i])) return; }
+    var addBtn = document.getElementById('add-material-btn');
+    var zoneA = document.getElementById('image-idea-zone');
+    var zoneB = document.getElementById('thumb-paste-zone');
+    var save = document.getElementById('fb-save-btn');
+    if (!addBtn || !zoneA || !zoneB || !save) return;
+    panel.dataset.sect = '1';
+
+    var s1 = makeSection('◾️ 依頼欄');
+    var s2 = makeSection('◾️ 納品欄');
+    var s3 = makeSection('◾️ 完了欄');
+    panel.insertBefore(s1.sec, save);
+    panel.insertBefore(s2.sec, save);
+    panel.insertBefore(s3.sec, save);
+
+    // 依頼欄
+    s1.right.appendChild(rowOf('materialUrl1'));
+    EXTRA_MATERIALS.forEach(function(k){ var rw = rowOf(k); if (rw) s1.right.appendChild(rw); });
+    s1.right.appendChild(addBtn);
+    s1.right.appendChild(rowOf('imageIdeaUrl'));
+    s1.right.appendChild(zoneA);
+    s1.right.appendChild(rowOf('thumbMaterialUrl'));
+    s1.left.appendChild(makeRequestCheck());
+
+    // 納品欄
+    s2.right.appendChild(rowOf('draftVideoUrl'));
+    s2.right.appendChild(rowOf('deliveryUrl'));
+    s2.right.appendChild(rowOf('thumbUrl'));
+    s2.right.appendChild(zoneB);
+
+    // 完了欄
+    s3.right.appendChild(rowOf('youtubeLink'));
+
+    // 既存の進捗チェックをセクション左側へ移動（チェックリスト描画後に実行）
+    setTimeout(function(){
+      moveCheckItem('動画確認', s2.left);
+      moveCheckItem('サムネ確認', s2.left);
+      moveCheckItem('予約投稿', s3.left);
+    }, 350);
+  }
+
   var mo = new MutationObserver(function(){
     enhancePanel();
     try { setupMaterialRows(); } catch(e){}
     try { injectZones(); } catch(e){}
+    try { restructurePanel(); } catch(e){}
   });
   mo.observe(document.body, { childList: true, subtree: true });
 })();

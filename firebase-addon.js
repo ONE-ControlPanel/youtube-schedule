@@ -298,7 +298,8 @@
 (function(){
   var ADDED = [
     {key:'thumbStaff', label:'サムネ担当', type:'select', opts:['','さきさん']},
-    {key:'deliveryUrl', label:'動画納品URL', type:'text'},
+    {key:'draftVideoUrl', label:'初稿動画URL', type:'text'},
+    {key:'deliveryUrl', label:'納品動画URL', type:'text'},
     {key:'reviewUrl', label:'校正依頼URL', type:'text'},
     {key:'materialUrl1', label:'素材URL①', type:'text'},
     {key:'materialUrl2', label:'素材URL②', type:'text'},
@@ -307,7 +308,7 @@
     {key:'materialUrl5', label:'素材URL⑤', type:'text'},
     {key:'imageIdeaUrl', label:'サムネイメージ画像', type:'text'},
     {key:'thumbMaterialUrl', label:'サムネ素材', type:'text'},
-    {key:'thumbUrl', label:'サムネ納品URL', type:'text'},
+    {key:'thumbUrl', label:'サムネ初稿納品URL', type:'text'},
     {key:'youtubeLink', label:'YouTubeリンク', type:'text'}
   ];
   var curKey=null, curNo=null;
