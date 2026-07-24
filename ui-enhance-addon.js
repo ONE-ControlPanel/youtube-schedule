@@ -4,7 +4,7 @@
 // ・画像貼り付けゾーン（サムネイメージ画像 imageIdeaData / 納品サムネ thumbData）
 // ・依頼欄／納品欄／完了欄の3セクション構成（左側に進捗チェック）
 ;(function(){
-  var URL_KEYS = ['deliveryUrl','reviewUrl','draftVideoUrl','fixedVideoUrl','materialUrl1','materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','imageIdeaUrl','thumbMaterialUrl','youtubeLink'];
+  var URL_KEYS = ['deliveryUrl','draftVideoUrl','fixedVideoUrl','materialUrl1','materialUrl2','materialUrl3','materialUrl4','materialUrl5','thumbUrl','imageIdeaUrl','thumbMaterialUrl','youtubeLink'];
 
   function currentRow(){
     var key = window.__fbCurKey, no = window.__fbCurNo;

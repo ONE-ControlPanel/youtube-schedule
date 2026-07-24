@@ -301,7 +301,6 @@
     {key:'draftVideoUrl', label:'初稿動画URL', type:'text'},
     {key:'fixedVideoUrl', label:'修正動画URL', type:'text'},
     {key:'deliveryUrl', label:'納品動画URL', type:'text'},
-    {key:'reviewUrl', label:'校正依頼URL', type:'text'},
     {key:'materialUrl1', label:'素材URL①', type:'text'},
     {key:'materialUrl2', label:'素材URL②', type:'text'},
     {key:'materialUrl3', label:'素材URL③', type:'text'},
