@@ -1,27 +1,34 @@
 /**
  * ChatWork送信 中継サーバー（Google Apps Script）
- * ダッシュボードの「予約完了をCWに報告」ボタンから呼ばれ、
- * ChatWork APIトークンを公開せずにメッセージを送信する。
+ * ダッシュボードの報告ボタン類から呼ばれ、APIトークンを公開せずに送信する。
  *
- * セットアップ手順:
- * 1. https://script.google.com で「新しいプロジェクト」を作成
- * 2. このコードを貼り付けて保存
- * 3. 左の歯車（プロジェクトの設定）→「スクリプト プロパティ」に以下を追加:
- *      CW_TOKEN   = ChatWork APIトークン
- *      CW_ROOM_ID = 288597442
- * 4. 右上「デプロイ」→「新しいデプロイ」→ 種類「ウェブアプリ」
- *      次のユーザーとして実行: 自分
- *      アクセスできるユーザー: 全員
- * 5. 発行された「ウェブアプリのURL」を report-addon.js の GAS_WEBHOOK_URL に設定
+ * リクエスト形式（POST, JSON）:
+ *   { "message": "本文" }                    → 既定ルーム(CW_ROOM_ID)へ送信
+ *   { "message": "本文", "room": "123456" }  → 指定ルームへ送信
+ *   { "action": "members", "room": "123456" } → ルームのメンバー一覧を返す（メンションID調査用）
+ *
+ * スクリプトプロパティ: CW_TOKEN, CW_ROOM_ID
  */
 function doPost(e) {
   try {
     var props = PropertiesService.getScriptProperties();
     var token = props.getProperty('CW_TOKEN');
-    var room = props.getProperty('CW_ROOM_ID');
-    if (!token || !room) return json_({ error: 'CW_TOKEN / CW_ROOM_ID が未設定です' });
+    var defaultRoom = props.getProperty('CW_ROOM_ID');
+    if (!token) return json_({ error: 'CW_TOKEN が未設定です' });
 
     var data = JSON.parse(e.postData.contents);
+    var room = String(data.room || defaultRoom || '');
+    if (!room) return json_({ error: 'room が未設定です' });
+
+    if (data.action === 'members') {
+      var res = UrlFetchApp.fetch('https://api.chatwork.com/v2/rooms/' + room + '/members', {
+        headers: { 'X-ChatWorkToken': token },
+        muteHttpExceptions: true,
+      });
+      return ContentService.createTextOutput(res.getContentText())
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     var message = String(data.message || '').substring(0, 2000);
     if (!message) return json_({ error: 'message が空です' });
 
