@@ -260,6 +260,10 @@
     else alert(m);
   }
 
+  // 依頼報告の送信先ルームとメンション相手
+  var REQUEST_ROOM_ID = '399892175';
+  var REQUEST_MENTION = '[To:10570588]山脇 翔太郎さん';
+
   function sendRequestReport(){
     var r = currentRow();
     if (!r) return;
@@ -268,12 +272,12 @@
       md = (r.date.getMonth()+1) + '/' + r.date.getDate();
       wd = '(' + ['日','月','火','水','木','金','土'][r.date.getDay()] + ')';
     }
-    var msg = '【依頼｜かずさんのYouTube】\n' + md + wd + '動画・サムネ素材アップ完了！\n担当者に依頼をお願いします！';
-    if (!confirm('以下の内容でChatWorkに送信します：\n\n' + msg)) return;
+    var msg = REQUEST_MENTION + '\n【依頼｜かずさんのYouTube】\n' + md + wd + '動画・サムネ素材アップ完了！\n担当者に依頼をお願いします！';
+    if (!confirm('以下の内容でChatWork（山脇さん宛て）に送信します：\n\n' + msg)) return;
     fetch(GAS_WEBHOOK_URL, {
       method: 'POST',
       headers: {'Content-Type': 'text/plain'},
-      body: JSON.stringify({ message: msg })
+      body: JSON.stringify({ message: msg, room: REQUEST_ROOM_ID })
     })
       .then(function(res){ return res.json(); })
       .then(function(j){
