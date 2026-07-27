@@ -366,11 +366,32 @@
     }, 350);
   }
 
+  // ---------- 保存時にダッシュボードのリンクを自動コピー ----------
+  var DASHBOARD_URL = 'https://one-controlpanel.github.io/youtube-schedule/';
+
+  function watchSaveCopy(){
+    var btn = document.getElementById('fb-save-btn');
+    if (!btn || btn.dataset.copyHook === '1') return;
+    btn.dataset.copyHook = '1';
+    var moB = new MutationObserver(function(){
+      if (btn.textContent.indexOf('保存しました') !== -1 && !btn.dataset.copied){
+        btn.dataset.copied = '1';
+        try {
+          navigator.clipboard.writeText(DASHBOARD_URL).then(function(){
+            if (typeof window.showToast === 'function') window.showToast('✓ 保存＆ダッシュボードのリンクをコピーしました');
+          }, function(){});
+        } catch(e){}
+      }
+    });
+    moB.observe(btn, { characterData: true, childList: true, subtree: true });
+  }
+
   var mo = new MutationObserver(function(){
     enhancePanel();
     try { setupMaterialRows(); } catch(e){}
     try { injectZones(); } catch(e){}
     try { restructurePanel(); } catch(e){}
+    try { watchSaveCopy(); } catch(e){}
   });
   mo.observe(document.body, { childList: true, subtree: true });
 })();
