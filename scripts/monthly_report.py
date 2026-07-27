@@ -202,15 +202,15 @@ def build_report(data: dict, month: str) -> str:
     lines = [
         "",
         "📊エンゲージメント",
-        f"・▶️ 総再生回数：{views_line}",
-        f"・⏱️ 総再生時間：{watch_time}",
-        f"・🕒 平均視聴時間：{avg_view}",
-        f"・📉 視聴維持率：{retention}",
+        f"・総再生回数：{views_line}",
+        f"・総再生時間：{watch_time}",
+        f"・平均視聴時間：{avg_view}",
+        f"・視聴維持率：{retention}",
     ] + ([f"　　{text_bar(an['avgViewPct'] / 100)} {an['avgViewPct']:.0f}%"] if an else []) + [
         "",
         "🌍オーディエンス",
-        f"・👥現在のチャンネル登録者数：{subs_now}",
-        f"・📈チャンネル登録者数の純増減：{subs_delta}",
+        f"・現在のチャンネル登録者数：{subs_now}",
+        f"・チャンネル登録者数の純増減：{subs_delta}",
     ]
     if not an:
         lines.append("")
@@ -222,7 +222,7 @@ def build_report(data: dict, month: str) -> str:
     published = [v for v in data.get("videos", [])
                  if start <= (v.get("publishedAt") or "")[:10] < end]
     published.sort(key=lambda v: v["views"], reverse=True)
-    medals = ["🏆 1位", "🥈 2位", "🥉 3位", "✨ 4位"]
+    medals = ["1位", "2位", "3位", "4位"]
     if published:
         total_views = sum(v["views"] for v in published) or 1
         max_views = published[0]["views"] or 1
@@ -233,7 +233,7 @@ def build_report(data: dict, month: str) -> str:
             lines.append(f"{medal}：{title}（{v['views']:,}回）")
             if medal.endswith("1位"):
                 # 1位のみ リンク → バー の順で表示する
-                lines.append(f"🔗 リンク：https://youtu.be/{v['id']}")
+                lines.append(f"リンク：https://youtu.be/{v['id']}")
                 lines.append(bar_line)
                 lines.append("")
             else:
