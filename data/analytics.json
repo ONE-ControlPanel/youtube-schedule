@@ -1,11 +1,11 @@
 {
- "updatedAt": "2026-07-31T04:35:58+09:00",
+ "updatedAt": "2026-08-01T04:37:43+09:00",
  "channel": {
   "id": "UCjqBCrrp1mfDBTKxyzMUgrA",
   "title": "かず | ONE代表",
   "thumbnail": "https://yt3.ggpht.com/yQhIMJ_RzIpvdQcO-pvnD2ywPkbEg49xDlbBpaS5GV__KAkQnfpwHjEwpA0fyQnkVlWvSc845Q=s240-c-k-c0x00ffffff-no-rj",
   "subscriberCount": 6060,
-  "viewCount": 344326,
+  "viewCount": 344357,
   "videoCount": 421
  },
  "videos": [
@@ -14,7 +14,7 @@
    "title": "【危険】今何もしてない人必見！2026年の学ぶべきAIとは！？",
    "publishedAt": "2026-07-26T09:00:01Z",
    "thumbnail": "https://i.ytimg.com/vi/OOc2dLJdI6M/mqdefault.jpg",
-   "views": 54,
+   "views": 58,
    "likes": 5,
    "comments": 0,
    "duration": "PT6M53S"
@@ -24,7 +24,7 @@
    "title": "【下半期】2026年後！ラストスパート「これ」をやるべし！",
    "publishedAt": "2026-07-19T09:00:06Z",
    "thumbnail": "https://i.ytimg.com/vi/au9wC4nZOZU/mqdefault.jpg",
-   "views": 105,
+   "views": 107,
    "likes": 4,
    "comments": 0,
    "duration": "PT4M2S"
@@ -44,7 +44,7 @@
    "title": "【🚨超重要🚨】みなさんへ大事なお知らせがあります！",
    "publishedAt": "2026-07-05T10:00:20Z",
    "thumbnail": "https://i.ytimg.com/vi/kPyKS03WAAI/mqdefault.jpg",
-   "views": 222,
+   "views": 223,
    "likes": 10,
    "comments": 0,
    "duration": "PT3M40S"
@@ -64,7 +64,7 @@
    "title": "【極楽】沖縄オフ会終えてリゾートホテルに来た！",
    "publishedAt": "2026-06-21T10:00:27Z",
    "thumbnail": "https://i.ytimg.com/vi/agAl9qBR-bw/mqdefault.jpg",
-   "views": 116,
+   "views": 117,
    "likes": 5,
    "comments": 0,
    "duration": "PT3M53S"
@@ -104,7 +104,7 @@
    "title": "【ONE史上最速】初月100万円利益を達成した53歳主婦の美奈子さん！【せどり】【副業】【インスタ】",
    "publishedAt": "2026-05-24T10:00:11Z",
    "thumbnail": "https://i.ytimg.com/vi/Z1bIdALP9os/mqdefault.jpg",
-   "views": 191,
+   "views": 192,
    "likes": 6,
    "comments": 0,
    "duration": "PT5M45S"
@@ -174,7 +174,7 @@
    "title": "30億円で会社売りました",
    "publishedAt": "2026-04-05T10:01:03Z",
    "thumbnail": "https://i.ytimg.com/vi/gbGrSIAWdy8/mqdefault.jpg",
-   "views": 257,
+   "views": 259,
    "likes": 5,
    "comments": 0,
    "duration": "PT6M54S"
@@ -194,7 +194,7 @@
    "title": "借金500万から1年で月利130万達成した！Amazon部門けんたろうさん【せどり】【副業】【Amazon】",
    "publishedAt": "2026-03-22T10:02:27Z",
    "thumbnail": "https://i.ytimg.com/vi/YT0jWuQK6RE/mqdefault.jpg",
-   "views": 129,
+   "views": 130,
    "likes": 5,
    "comments": 0,
    "duration": "PT4M41S"
@@ -641,6 +641,12 @@
    "date": "2026-07-31",
    "subscriberCount": 6060,
    "viewCount": 344326,
+   "videoCount": 421
+  },
+  {
+   "date": "2026-08-01",
+   "subscriberCount": 6060,
+   "viewCount": 344357,
    "videoCount": 421
   }
  ]
