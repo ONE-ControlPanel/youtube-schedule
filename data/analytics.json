@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-02T04:11:52+09:00",
+ "updatedAt": "2026-08-03T04:14:18+09:00",
  "channel": {
   "id": "UCjqBCrrp1mfDBTKxyzMUgrA",
   "title": "かず | ONE代表",
@@ -14,7 +14,7 @@
    "title": "【危険】今何もしてない人必見！2026年の学ぶべきAIとは！？",
    "publishedAt": "2026-07-26T09:00:01Z",
    "thumbnail": "https://i.ytimg.com/vi/OOc2dLJdI6M/mqdefault.jpg",
-   "views": 64,
+   "views": 66,
    "likes": 5,
    "comments": 0,
    "duration": "PT6M53S"
@@ -34,7 +34,7 @@
    "title": "【かず流】生産性を上げるベストバイ&習慣化の仕組み",
    "publishedAt": "2026-07-12T09:00:14Z",
    "thumbnail": "https://i.ytimg.com/vi/FJMMZ0lYc54/mqdefault.jpg",
-   "views": 96,
+   "views": 97,
    "likes": 3,
    "comments": 0,
    "duration": "PT10M"
@@ -44,7 +44,7 @@
    "title": "【🚨超重要🚨】みなさんへ大事なお知らせがあります！",
    "publishedAt": "2026-07-05T10:00:20Z",
    "thumbnail": "https://i.ytimg.com/vi/kPyKS03WAAI/mqdefault.jpg",
-   "views": 223,
+   "views": 226,
    "likes": 10,
    "comments": 0,
    "duration": "PT3M40S"
@@ -124,7 +124,7 @@
    "title": "未経験から月利350万円達成した！元会社員の櫻岡さん【せどり】【副業】【Amazon】",
    "publishedAt": "2026-05-10T10:00:27Z",
    "thumbnail": "https://i.ytimg.com/vi/N0catTNeHIY/mqdefault.jpg",
-   "views": 130,
+   "views": 131,
    "likes": 7,
    "comments": 0,
    "duration": "PT5M6S"
@@ -134,7 +134,7 @@
    "title": "【初登場】開始8ヶ月で200万！アパレル講師の堤さん！【せどり】【副業】【メルカリ】",
    "publishedAt": "2026-05-03T10:00:11Z",
    "thumbnail": "https://i.ytimg.com/vi/8uaONqsLTRM/mqdefault.jpg",
-   "views": 130,
+   "views": 131,
    "likes": 6,
    "comments": 0,
    "duration": "PT3M30S"
@@ -144,7 +144,7 @@
    "title": "【重大発表】ONEグループは上場企業グループに入ることになりました！年商100億を目指します！",
    "publishedAt": "2026-04-26T10:00:39Z",
    "thumbnail": "https://i.ytimg.com/vi/P_FsaCg8IFM/mqdefault.jpg",
-   "views": 237,
+   "views": 238,
    "likes": 12,
    "comments": 0,
    "duration": "PT5M5S"
@@ -354,7 +354,7 @@
    "title": "ヒカルさんの10億のヴィラに最高の仲間とワーケーションに行ってきました！【せどり】【副業】【メルカリ】",
    "publishedAt": "2025-11-16T10:01:10Z",
    "thumbnail": "https://i.ytimg.com/vi/lJulgzLvEVE/mqdefault.jpg",
-   "views": 4191,
+   "views": 4193,
    "likes": 70,
    "comments": 0,
    "duration": "PT4M54S"
@@ -651,6 +651,12 @@
   },
   {
    "date": "2026-08-02",
+   "subscriberCount": 6060,
+   "viewCount": 344379,
+   "videoCount": 421
+  },
+  {
+   "date": "2026-08-03",
    "subscriberCount": 6060,
    "viewCount": 344379,
    "videoCount": 421
