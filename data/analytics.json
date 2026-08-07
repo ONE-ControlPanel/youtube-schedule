@@ -1,20 +1,30 @@
 {
- "updatedAt": "2026-08-07T09:04:17+09:00",
+ "updatedAt": "2026-08-08T04:00:32+09:00",
  "channel": {
   "id": "UCjqBCrrp1mfDBTKxyzMUgrA",
   "title": "かず | ONE代表",
   "thumbnail": "https://yt3.ggpht.com/yQhIMJ_RzIpvdQcO-pvnD2ywPkbEg49xDlbBpaS5GV__KAkQnfpwHjEwpA0fyQnkVlWvSc845Q=s240-c-k-c0x00ffffff-no-rj",
   "subscriberCount": 6060,
-  "viewCount": 344564,
-  "videoCount": 422
+  "viewCount": 344602,
+  "videoCount": 423
  },
  "videos": [
+  {
+   "id": "Or14A2H2FR8",
+   "title": "【参加者1000名】ONEぶち上げオフ会に密着",
+   "publishedAt": "2026-08-07T09:00:18Z",
+   "thumbnail": "https://i.ytimg.com/vi/Or14A2H2FR8/mqdefault.jpg",
+   "views": 57,
+   "likes": 6,
+   "comments": 0,
+   "duration": "PT16M33S"
+  },
   {
    "id": "OOc2dLJdI6M",
    "title": "【危険】今何もしてない人必見！2026年の学ぶべきAIとは！？",
    "publishedAt": "2026-07-26T09:00:01Z",
    "thumbnail": "https://i.ytimg.com/vi/OOc2dLJdI6M/mqdefault.jpg",
-   "views": 76,
+   "views": 78,
    "likes": 5,
    "comments": 0,
    "duration": "PT6M53S"
@@ -44,7 +54,7 @@
    "title": "【🚨超重要🚨】みなさんへ大事なお知らせがあります！",
    "publishedAt": "2026-07-05T10:00:20Z",
    "thumbnail": "https://i.ytimg.com/vi/kPyKS03WAAI/mqdefault.jpg",
-   "views": 231,
+   "views": 232,
    "likes": 10,
    "comments": 0,
    "duration": "PT3M40S"
@@ -134,7 +144,7 @@
    "title": "【初登場】開始8ヶ月で200万！アパレル講師の堤さん！【せどり】【副業】【メルカリ】",
    "publishedAt": "2026-05-03T10:00:11Z",
    "thumbnail": "https://i.ytimg.com/vi/8uaONqsLTRM/mqdefault.jpg",
-   "views": 131,
+   "views": 132,
    "likes": 6,
    "comments": 0,
    "duration": "PT3M30S"
@@ -204,7 +214,7 @@
    "title": "【初登場】副業で月利300万達成!?AIONE講師の小高さん！その驚愕の手法とは？【せどり】【副業】【AI】",
    "publishedAt": "2026-03-08T10:01:07Z",
    "thumbnail": "https://i.ytimg.com/vi/kNd2B6vru-I/mqdefault.jpg",
-   "views": 209,
+   "views": 210,
    "likes": 2,
    "comments": 0,
    "duration": "PT3M20S"
@@ -434,7 +444,7 @@
    "title": "青笹(あお)君について",
    "publishedAt": "2025-09-21T10:00:41Z",
    "thumbnail": "https://i.ytimg.com/vi/PwTwHZ4ALZg/mqdefault.jpg",
-   "views": 575,
+   "views": 576,
    "likes": 16,
    "comments": 0,
    "duration": "PT6M36S"
@@ -464,7 +474,7 @@
    "title": "【報告】株式会社Smart Lifeを辞めることにしました！",
    "publishedAt": "2025-09-07T10:00:43Z",
    "thumbnail": "https://i.ytimg.com/vi/TVmAvKjZc0Q/mqdefault.jpg",
-   "views": 351,
+   "views": 352,
    "likes": 12,
    "comments": 0,
    "duration": "PT3M28S"
@@ -498,16 +508,6 @@
    "likes": 4,
    "comments": 0,
    "duration": "PT4M1S"
-  },
-  {
-   "id": "4xhvRD-D5pE",
-   "title": "ChatGPT正直使えなくない？",
-   "publishedAt": "2025-08-20T10:00:09Z",
-   "thumbnail": "https://i.ytimg.com/vi/4xhvRD-D5pE/mqdefault.jpg",
-   "views": 105,
-   "likes": 1,
-   "comments": 0,
-   "duration": "PT5M24S"
   }
  ],
  "history": [
@@ -684,6 +684,12 @@
    "subscriberCount": 6060,
    "viewCount": 344564,
    "videoCount": 422
+  },
+  {
+   "date": "2026-08-08",
+   "subscriberCount": 6060,
+   "viewCount": 344602,
+   "videoCount": 423
   }
  ]
 }
