@@ -1,11 +1,11 @@
 {
- "updatedAt": "2026-08-08T04:00:32+09:00",
+ "updatedAt": "2026-08-09T03:40:19+09:00",
  "channel": {
   "id": "UCjqBCrrp1mfDBTKxyzMUgrA",
   "title": "かず | ONE代表",
   "thumbnail": "https://yt3.ggpht.com/yQhIMJ_RzIpvdQcO-pvnD2ywPkbEg49xDlbBpaS5GV__KAkQnfpwHjEwpA0fyQnkVlWvSc845Q=s240-c-k-c0x00ffffff-no-rj",
   "subscriberCount": 6060,
-  "viewCount": 344602,
+  "viewCount": 344728,
   "videoCount": 423
  },
  "videos": [
@@ -14,8 +14,8 @@
    "title": "【参加者1000名】ONEぶち上げオフ会に密着",
    "publishedAt": "2026-08-07T09:00:18Z",
    "thumbnail": "https://i.ytimg.com/vi/Or14A2H2FR8/mqdefault.jpg",
-   "views": 57,
-   "likes": 6,
+   "views": 122,
+   "likes": 10,
    "comments": 0,
    "duration": "PT16M33S"
   },
@@ -24,8 +24,8 @@
    "title": "【危険】今何もしてない人必見！2026年の学ぶべきAIとは！？",
    "publishedAt": "2026-07-26T09:00:01Z",
    "thumbnail": "https://i.ytimg.com/vi/OOc2dLJdI6M/mqdefault.jpg",
-   "views": 78,
-   "likes": 5,
+   "views": 79,
+   "likes": 4,
    "comments": 0,
    "duration": "PT6M53S"
   },
@@ -44,7 +44,7 @@
    "title": "【かず流】生産性を上げるベストバイ&習慣化の仕組み",
    "publishedAt": "2026-07-12T09:00:14Z",
    "thumbnail": "https://i.ytimg.com/vi/FJMMZ0lYc54/mqdefault.jpg",
-   "views": 101,
+   "views": 102,
    "likes": 3,
    "comments": 0,
    "duration": "PT10M"
@@ -64,7 +64,7 @@
    "title": "Amazon電脳で月100万達成できたマキさんに来てもらいましたin沖縄！【副業】【せどり】【Amazon】",
    "publishedAt": "2026-06-28T10:00:32Z",
    "thumbnail": "https://i.ytimg.com/vi/vUjXa_GtvSI/mqdefault.jpg",
-   "views": 159,
+   "views": 161,
    "likes": 12,
    "comments": 0,
    "duration": "PT12M21S"
@@ -174,7 +174,7 @@
    "title": "【初登場】借金200万から年収3000万！年商10億まで登り上げたONEの最強の右腕となった晴菜さん【せどり】【副業】【AI】",
    "publishedAt": "2026-04-12T10:01:00Z",
    "thumbnail": "https://i.ytimg.com/vi/g4_NhHjMJCo/mqdefault.jpg",
-   "views": 255,
+   "views": 256,
    "likes": 7,
    "comments": 0,
    "duration": "PT7M59S"
@@ -214,7 +214,7 @@
    "title": "【初登場】副業で月利300万達成!?AIONE講師の小高さん！その驚愕の手法とは？【せどり】【副業】【AI】",
    "publishedAt": "2026-03-08T10:01:07Z",
    "thumbnail": "https://i.ytimg.com/vi/kNd2B6vru-I/mqdefault.jpg",
-   "views": 210,
+   "views": 212,
    "likes": 2,
    "comments": 0,
    "duration": "PT3M20S"
@@ -224,7 +224,7 @@
    "title": "【初登場】Amazon物販で月700万稼ぐ3児のパパ永田さん【せどり】【副業】【Amazon】",
    "publishedAt": "2026-03-01T10:00:08Z",
    "thumbnail": "https://i.ytimg.com/vi/7U7QliSWA7c/mqdefault.jpg",
-   "views": 162,
+   "views": 163,
    "likes": 3,
    "comments": 0,
    "duration": "PT4M23S"
@@ -304,7 +304,7 @@
    "title": "【ガチ体験】講師が4000万の詐欺に遭いました【せどり】【副業】【メルカリ】",
    "publishedAt": "2025-12-28T10:00:21Z",
    "thumbnail": "https://i.ytimg.com/vi/Gd2PqxVfvdk/mqdefault.jpg",
-   "views": 161,
+   "views": 162,
    "likes": 2,
    "comments": 0,
    "duration": "PT4M3S"
@@ -364,7 +364,7 @@
    "title": "ヒカルさんの10億のヴィラに最高の仲間とワーケーションに行ってきました！【せどり】【副業】【メルカリ】",
    "publishedAt": "2025-11-16T10:01:10Z",
    "thumbnail": "https://i.ytimg.com/vi/lJulgzLvEVE/mqdefault.jpg",
-   "views": 4193,
+   "views": 4194,
    "likes": 70,
    "comments": 0,
    "duration": "PT4M54S"
@@ -689,6 +689,12 @@
    "date": "2026-08-08",
    "subscriberCount": 6060,
    "viewCount": 344602,
+   "videoCount": 423
+  },
+  {
+   "date": "2026-08-09",
+   "subscriberCount": 6060,
+   "viewCount": 344728,
    "videoCount": 423
   }
  ]
