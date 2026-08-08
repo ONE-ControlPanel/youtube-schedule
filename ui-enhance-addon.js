@@ -366,6 +366,49 @@
     }, 350);
   }
 
+  // ---------- 全項目の自動保存（入力後にフォーカスを外すと保存される） ----------
+  function saveFields(patchObj, done){
+    var key = window.__fbCurKey, no = window.__fbCurNo;
+    var fb = window.firebase;
+    if (!key || no == null || !fb) return;
+    var u = fb.auth().currentUser;
+    var patch = { updatedAt: fb.firestore.FieldValue.serverTimestamp(), updatedBy: (u && u.email) || 'unknown' };
+    Object.keys(patchObj).forEach(function(k){ patch[k] = patchObj[k]; });
+    fb.firestore().collection('edits').doc(key + '_' + no).set(patch, {merge:true}).then(function(){
+      var r = currentRow();
+      if (r) Object.keys(patchObj).forEach(function(k){ r[k] = patchObj[k]; });
+      if (typeof window.showToast === 'function') window.showToast('✓ 自動保存しました');
+      if (done) done(true);
+    }).catch(function(e){ alert('保存失敗: ' + e.message); if (done) done(false); });
+  }
+
+  function bindAutoSave(el, buildPatch){
+    if (!el || el.dataset.autoSave === '1') return;
+    el.dataset.autoSave = '1';
+    el.addEventListener('change', function(){
+      var patch = buildPatch(el.value);
+      if (patch) saveFields(patch);
+    });
+  }
+
+  function setupAutoSave(){
+    var panel = document.getElementById('fb-edit-panel');
+    if (!panel) return;
+    bindAutoSave(document.getElementById('fb-edit-date'), function(v){
+      if (!v) return { dateStr: '', changedDate: '' };
+      var p = v.split('-');
+      var ds = p[0] + '/' + parseInt(p[1], 10) + '/' + parseInt(p[2], 10);
+      return { dateStr: ds, changedDate: ds };
+    });
+    bindAutoSave(document.getElementById('fb-edit-title'), function(v){ return { title: v }; });
+    bindAutoSave(document.getElementById('fb-edit-staff'), function(v){ return { videoStaff: v }; });
+    bindAutoSave(document.getElementById('fb-edit-note'), function(v){ return { notes: v }; });
+    panel.querySelectorAll('[id^="fb-edit-ext-"]').forEach(function(el){
+      var key = el.id.slice('fb-edit-ext-'.length);
+      bindAutoSave(el, function(v){ var o = {}; o[key] = v; return o; });
+    });
+  }
+
   // ---------- 保存時にダッシュボードのリンクを自動コピー ----------
   var DASHBOARD_URL = 'https://one-controlpanel.github.io/youtube-schedule/';
 
@@ -392,6 +435,7 @@
     try { injectZones(); } catch(e){}
     try { restructurePanel(); } catch(e){}
     try { watchSaveCopy(); } catch(e){}
+    try { setupAutoSave(); } catch(e){}
   });
   mo.observe(document.body, { childList: true, subtree: true });
 })();
