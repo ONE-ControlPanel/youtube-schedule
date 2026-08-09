@@ -272,7 +272,19 @@
       md = (r.date.getMonth()+1) + '/' + r.date.getDate();
       wd = '(' + ['日','月','火','水','木','金','土'][r.date.getDay()] + ')';
     }
+    // 依頼欄に入力されているリンクを収集
+    var linkDefs = [
+      ['素材URL①','materialUrl1'], ['素材URL②','materialUrl2'], ['素材URL③','materialUrl3'],
+      ['素材URL④','materialUrl4'], ['素材URL⑤','materialUrl5'],
+      ['サムネイメージ画像','imageIdeaUrl'], ['サムネ素材','thumbMaterialUrl'],
+    ];
+    var links = [];
+    linkDefs.forEach(function(d){
+      var v = (r[d[1]] || '').trim();
+      if (v) links.push(d[0] + '：' + v);
+    });
     var msg = REQUEST_MENTION + '\n【依頼｜かずさんのYouTube】\n' + md + wd + '動画・サムネ素材アップ完了！\n担当者に依頼をお願いします！';
+    if (links.length) msg += '\nリンク：\n' + links.join('\n');
     if (!confirm('以下の内容でChatWork（山脇さん宛て）に送信します：\n\n' + msg)) return;
     fetch(GAS_WEBHOOK_URL, {
       method: 'POST',
