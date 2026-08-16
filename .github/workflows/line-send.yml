@@ -1,0 +1,52 @@
+name: LINEにメッセージを送信
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: '送信するメッセージ本文'
+        required: true
+        type: string
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: LINE Messaging APIへ送信
+        env:
+          LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
+          LINE_TO: ${{ secrets.LINE_TO }}
+          MESSAGE: ${{ inputs.message }}
+        run: |
+          if [ -z "$LINE_TOKEN" ] || [ -z "$LINE_TO" ]; then
+            echo "::error::LINE_TOKEN / LINE_TO のシークレットが未設定です"
+            exit 1
+          fi
+          python3 - <<'EOF'
+          import os, json, urllib.request, urllib.error
+
+          token = os.environ["LINE_TOKEN"].strip()
+          to = os.environ["LINE_TO"].strip()
+          msg = os.environ["MESSAGE"]
+
+          # LINEのtextメッセージ上限は5000文字・1回のpushで最大5通
+          chunks = [msg[i:i + 4900] for i in range(0, len(msg), 4900)][:5]
+          payload = {
+              "to": to,
+              "messages": [{"type": "text", "text": c} for c in chunks],
+          }
+          req = urllib.request.Request(
+              "https://api.line.me/v2/bot/message/push",
+              data=json.dumps(payload).encode("utf-8"),
+              headers={
+                  "Content-Type": "application/json",
+                  "Authorization": "Bearer " + token,
+              },
+          )
+          try:
+              with urllib.request.urlopen(req) as r:
+                  print("送信OK:", r.status)
+          except urllib.error.HTTPError as e:
+              print("送信エラー:", e.code, e.read().decode("utf-8", "replace"))
+              raise SystemExit(1)
+          EOF
