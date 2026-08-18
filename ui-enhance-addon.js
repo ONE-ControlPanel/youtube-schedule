@@ -12,6 +12,35 @@
     return window.months[key].rows.find(function(r){ return r.no === no; }) || null;
   }
 
+  // ---------- 補足の削除ガード ----------
+  // 一度記載された補足は、パスワードなしでは削除・短縮できない
+  var NOTES_DELETE_PASSWORD = 'kazu2026';
+
+  window.__guardNotesValue = function(el){
+    if (!el) return '';
+    var nv = el.value;
+    var saved = '';
+    var cands = [el.dataset.guardBase || ''];
+    try { var r = currentRow(); if (r && r.notes) cands.push(String(r.notes)); } catch(e){}
+    try {
+      var k = window.__fbCurKey, n = window.__fbCurNo;
+      if (k && n != null && window.__fbNotes) cands.push(String(window.__fbNotes[k + '_' + n] || ''));
+    } catch(e){}
+    cands.forEach(function(c){ if (c && c.trim().length > saved.trim().length) saved = c; });
+    if (saved.trim() && nv.trim().length < saved.trim().length){
+      var pw = prompt('⚠️ 補足は一度記載すると削除・短縮できません。\n削除する場合はパスワードを入力してください：');
+      if (pw !== NOTES_DELETE_PASSWORD){
+        el.value = saved;
+        el.dataset.guardBase = saved;
+        if (pw !== null) alert('パスワードが違います。補足を元に戻しました。');
+        else if (typeof window.showToast === 'function') window.showToast('補足を元に戻しました');
+        return saved;
+      }
+    }
+    el.dataset.guardBase = nv;
+    return nv;
+  };
+
   function rowOf(key){
     var i = document.getElementById('fb-edit-ext-' + key);
     return i ? (i.closest('.fb-edit-row') || i.parentNode) : null;
@@ -414,7 +443,12 @@
     });
     bindAutoSave(document.getElementById('fb-edit-title'), function(v){ return { title: v }; });
     bindAutoSave(document.getElementById('fb-edit-staff'), function(v){ return { videoStaff: v }; });
-    bindAutoSave(document.getElementById('fb-edit-note'), function(v){ return { notes: v }; });
+    bindAutoSave(document.getElementById('fb-edit-note'), function(v){
+      var el = document.getElementById('fb-edit-note');
+      var fin = window.__guardNotesValue ? window.__guardNotesValue(el) : v;
+      if (fin !== v) return null; // 差し戻された場合は保存しない
+      return { notes: fin, myNote: fin };
+    });
     panel.querySelectorAll('[id^="fb-edit-ext-"]').forEach(function(el){
       var key = el.id.slice('fb-edit-ext-'.length);
       bindAutoSave(el, function(v){ var o = {}; o[key] = v; return o; });

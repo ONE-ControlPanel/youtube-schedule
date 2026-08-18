@@ -370,7 +370,7 @@
     var s=document.getElementById('fb-edit-staff').value;
     var n=document.getElementById('fb-edit-note');
     var patch={title:t, videoStaff:s};
-    if(n) patch.notes=n.value;
+    if(n){ var gv=(window.__guardNotesValue?window.__guardNotesValue(n):n.value); patch.notes=gv; patch.myNote=gv; }
     if(d){ var dp=d.split('-'); patch.dateStr=dp[0]+'/'+parseInt(dp[1])+'/'+parseInt(dp[2]); }
     ADDED.forEach(function(f){
       var el=document.getElementById('fb-edit-ext-'+f.key);
