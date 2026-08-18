@@ -14,7 +14,7 @@
 
   // ---------- 補足の削除ガード ----------
   // 一度記載された補足は、パスワードなしでは削除・短縮できない
-  var NOTES_DELETE_PASSWORD = 'kazu2026';
+  var NOTES_DELETE_PASSWORD = 'kazu0711';
 
   window.__guardNotesValue = function(el){
     if (!el) return '';
