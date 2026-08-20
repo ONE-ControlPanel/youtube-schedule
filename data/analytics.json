@@ -1,11 +1,11 @@
 {
- "updatedAt": "2026-08-20T03:38:14+09:00",
+ "updatedAt": "2026-08-21T03:41:45+09:00",
  "channel": {
   "id": "UCjqBCrrp1mfDBTKxyzMUgrA",
   "title": "かず | ONE代表",
   "thumbnail": "https://yt3.ggpht.com/yQhIMJ_RzIpvdQcO-pvnD2ywPkbEg49xDlbBpaS5GV__KAkQnfpwHjEwpA0fyQnkVlWvSc845Q=s240-c-k-c0x00ffffff-no-rj",
   "subscriberCount": 6070,
-  "viewCount": 345303,
+  "viewCount": 345337,
   "videoCount": 424
  },
  "videos": [
@@ -24,7 +24,7 @@
    "title": "【参加者1000名】ONEぶち上げオフ会に密着",
    "publishedAt": "2026-08-07T09:00:18Z",
    "thumbnail": "https://i.ytimg.com/vi/Or14A2H2FR8/mqdefault.jpg",
-   "views": 272,
+   "views": 273,
    "likes": 16,
    "comments": 0,
    "duration": "PT16M33S"
@@ -134,7 +134,7 @@
    "title": "【大活躍中】SNSで2億売り上げるSNSのプロいそっち！【せどり】【副業】【メルカリ】",
    "publishedAt": "2026-05-17T10:00:38Z",
    "thumbnail": "https://i.ytimg.com/vi/RKyENxqvaTI/mqdefault.jpg",
-   "views": 179,
+   "views": 180,
    "likes": 6,
    "comments": 0,
    "duration": "PT6M17S"
@@ -184,7 +184,7 @@
    "title": "【初登場】借金200万から年収3000万！年商10億まで登り上げたONEの最強の右腕となった晴菜さん【せどり】【副業】【AI】",
    "publishedAt": "2026-04-12T10:01:00Z",
    "thumbnail": "https://i.ytimg.com/vi/g4_NhHjMJCo/mqdefault.jpg",
-   "views": 259,
+   "views": 260,
    "likes": 7,
    "comments": 0,
    "duration": "PT7M59S"
@@ -324,7 +324,7 @@
    "title": "【ガチ成功者】月200万稼いだ元生徒が今は運営の〇〇に就任しました【せどり】【副業】【Amazon】",
    "publishedAt": "2025-12-21T10:00:06Z",
    "thumbnail": "https://i.ytimg.com/vi/3ZHezJWtWfE/mqdefault.jpg",
-   "views": 394,
+   "views": 395,
    "likes": 7,
    "comments": 0,
    "duration": "PT7M8S"
@@ -761,6 +761,12 @@
    "date": "2026-08-20",
    "subscriberCount": 6070,
    "viewCount": 345303,
+   "videoCount": 424
+  },
+  {
+   "date": "2026-08-21",
+   "subscriberCount": 6070,
+   "viewCount": 345337,
    "videoCount": 424
   }
  ]
