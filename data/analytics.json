@@ -1,11 +1,11 @@
 {
- "updatedAt": "2026-08-26T03:41:55+09:00",
+ "updatedAt": "2026-08-27T04:49:58+09:00",
  "channel": {
   "id": "UCjqBCrrp1mfDBTKxyzMUgrA",
   "title": "かず | ONE代表",
   "thumbnail": "https://yt3.ggpht.com/yQhIMJ_RzIpvdQcO-pvnD2ywPkbEg49xDlbBpaS5GV__KAkQnfpwHjEwpA0fyQnkVlWvSc845Q=s240-c-k-c0x00ffffff-no-rj",
-  "subscriberCount": 6070,
-  "viewCount": 345582,
+  "subscriberCount": 6080,
+  "viewCount": 345599,
   "videoCount": 425
  },
  "videos": [
@@ -14,8 +14,8 @@
    "title": "今一番熱い投資はコレ！",
    "publishedAt": "2026-08-23T09:00:27Z",
    "thumbnail": "https://i.ytimg.com/vi/NVW3QhlxAQs/mqdefault.jpg",
-   "views": 73,
-   "likes": 4,
+   "views": 90,
+   "likes": 6,
    "comments": 0,
    "duration": "PT7M53S"
   },
@@ -34,7 +34,7 @@
    "title": "【参加者1000名】ONEぶち上げオフ会に密着",
    "publishedAt": "2026-08-07T09:00:18Z",
    "thumbnail": "https://i.ytimg.com/vi/Or14A2H2FR8/mqdefault.jpg",
-   "views": 290,
+   "views": 295,
    "likes": 16,
    "comments": 0,
    "duration": "PT16M33S"
@@ -44,7 +44,7 @@
    "title": "【危険】今何もしてない人必見！2026年の学ぶべきAIとは！？",
    "publishedAt": "2026-07-26T09:00:01Z",
    "thumbnail": "https://i.ytimg.com/vi/OOc2dLJdI6M/mqdefault.jpg",
-   "views": 97,
+   "views": 98,
    "likes": 4,
    "comments": 0,
    "duration": "PT6M53S"
@@ -84,7 +84,7 @@
    "title": "Amazon電脳で月100万達成できたマキさんに来てもらいましたin沖縄！【副業】【せどり】【Amazon】",
    "publishedAt": "2026-06-28T10:00:32Z",
    "thumbnail": "https://i.ytimg.com/vi/vUjXa_GtvSI/mqdefault.jpg",
-   "views": 175,
+   "views": 176,
    "likes": 12,
    "comments": 0,
    "duration": "PT12M21S"
@@ -174,7 +174,7 @@
    "title": "【重大発表】ONEグループは上場企業グループに入ることになりました！年商100億を目指します！",
    "publishedAt": "2026-04-26T10:00:39Z",
    "thumbnail": "https://i.ytimg.com/vi/P_FsaCg8IFM/mqdefault.jpg",
-   "views": 244,
+   "views": 245,
    "likes": 12,
    "comments": 0,
    "duration": "PT5M5S"
@@ -184,7 +184,7 @@
    "title": "【元スキージャンパー】AIONE受講生1000人越え！動画編集からChatGPTマスターへ登り詰めたAI ONE講師伊藤さん【せどり】【副業】【AI】",
    "publishedAt": "2026-04-19T10:00:44Z",
    "thumbnail": "https://i.ytimg.com/vi/Tl7SPxWFgcw/mqdefault.jpg",
-   "views": 134,
+   "views": 137,
    "likes": 3,
    "comments": 0,
    "duration": "PT4M26S"
@@ -234,7 +234,7 @@
    "title": "【初登場】副業で月利300万達成!?AIONE講師の小高さん！その驚愕の手法とは？【せどり】【副業】【AI】",
    "publishedAt": "2026-03-08T10:01:07Z",
    "thumbnail": "https://i.ytimg.com/vi/kNd2B6vru-I/mqdefault.jpg",
-   "views": 218,
+   "views": 219,
    "likes": 2,
    "comments": 0,
    "duration": "PT3M20S"
@@ -314,7 +314,7 @@
    "title": "年明け1発目の特大企画が始まります",
    "publishedAt": "2026-01-04T10:01:31Z",
    "thumbnail": "https://i.ytimg.com/vi/tpYKwpvu56U/mqdefault.jpg",
-   "views": 137,
+   "views": 138,
    "likes": 8,
    "comments": 0,
    "duration": "PT6M37S"
@@ -334,7 +334,7 @@
    "title": "【ガチ成功者】月200万稼いだ元生徒が今は運営の〇〇に就任しました【せどり】【副業】【Amazon】",
    "publishedAt": "2025-12-21T10:00:06Z",
    "thumbnail": "https://i.ytimg.com/vi/3ZHezJWtWfE/mqdefault.jpg",
-   "views": 399,
+   "views": 400,
    "likes": 7,
    "comments": 0,
    "duration": "PT7M8S"
@@ -797,6 +797,12 @@
    "date": "2026-08-26",
    "subscriberCount": 6070,
    "viewCount": 345582,
+   "videoCount": 425
+  },
+  {
+   "date": "2026-08-27",
+   "subscriberCount": 6080,
+   "viewCount": 345599,
    "videoCount": 425
   }
  ]
