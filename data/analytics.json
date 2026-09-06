@@ -1,20 +1,30 @@
 {
- "updatedAt": "2026-09-06T05:04:31+09:00",
+ "updatedAt": "2026-09-07T05:08:59+09:00",
  "channel": {
   "id": "UCjqBCrrp1mfDBTKxyzMUgrA",
   "title": "かず | ONE代表",
   "thumbnail": "https://yt3.ggpht.com/yQhIMJ_RzIpvdQcO-pvnD2ywPkbEg49xDlbBpaS5GV__KAkQnfpwHjEwpA0fyQnkVlWvSc845Q=s240-c-k-c0x00ffffff-no-rj",
   "subscriberCount": 6090,
-  "viewCount": 346322,
-  "videoCount": 426
+  "viewCount": 346463,
+  "videoCount": 427
  },
  "videos": [
+  {
+   "id": "LE1q2n_iUQ8",
+   "title": "【募集】スクール事業やってる方へ",
+   "publishedAt": "2026-09-06T09:00:19Z",
+   "thumbnail": "https://i.ytimg.com/vi/LE1q2n_iUQ8/mqdefault.jpg",
+   "views": 71,
+   "likes": 1,
+   "comments": 0,
+   "duration": "PT7M5S"
+  },
   {
    "id": "VxjOTGnBo1A",
    "title": "【初心者向け】AIに月3000円課金するなら？絶対にClaude Code一択！！",
    "publishedAt": "2026-08-30T09:00:10Z",
    "thumbnail": "https://i.ytimg.com/vi/VxjOTGnBo1A/mqdefault.jpg",
-   "views": 209,
+   "views": 222,
    "likes": 5,
    "comments": 0,
    "duration": "PT4M29S"
@@ -24,7 +34,7 @@
    "title": "今一番熱い投資はコレ！",
    "publishedAt": "2026-08-23T09:00:27Z",
    "thumbnail": "https://i.ytimg.com/vi/NVW3QhlxAQs/mqdefault.jpg",
-   "views": 147,
+   "views": 151,
    "likes": 7,
    "comments": 0,
    "duration": "PT7M53S"
@@ -34,7 +44,7 @@
    "title": "かずさん奢りの大企画 東京オフ会を終えて 【総勢1000人以上ビック企画】",
    "publishedAt": "2026-08-16T10:00:37Z",
    "thumbnail": "https://i.ytimg.com/vi/KnQSj7NY-sk/mqdefault.jpg",
-   "views": 114,
+   "views": 117,
    "likes": 6,
    "comments": 0,
    "duration": "PT4M6S"
@@ -44,7 +54,7 @@
    "title": "【参加者1000名】ONEぶち上げオフ会に密着",
    "publishedAt": "2026-08-07T09:00:18Z",
    "thumbnail": "https://i.ytimg.com/vi/Or14A2H2FR8/mqdefault.jpg",
-   "views": 323,
+   "views": 325,
    "likes": 17,
    "comments": 0,
    "duration": "PT16M33S"
@@ -54,7 +64,7 @@
    "title": "【危険】今何もしてない人必見！2026年の学ぶべきAIとは！？",
    "publishedAt": "2026-07-26T09:00:01Z",
    "thumbnail": "https://i.ytimg.com/vi/OOc2dLJdI6M/mqdefault.jpg",
-   "views": 106,
+   "views": 107,
    "likes": 4,
    "comments": 0,
    "duration": "PT6M53S"
@@ -64,7 +74,7 @@
    "title": "【下半期】2026年後！ラストスパート「これ」をやるべし！",
    "publishedAt": "2026-07-19T09:00:06Z",
    "thumbnail": "https://i.ytimg.com/vi/au9wC4nZOZU/mqdefault.jpg",
-   "views": 118,
+   "views": 120,
    "likes": 4,
    "comments": 0,
    "duration": "PT4M2S"
@@ -74,7 +84,7 @@
    "title": "【かず流】生産性を上げるベストバイ&習慣化の仕組み",
    "publishedAt": "2026-07-12T09:00:14Z",
    "thumbnail": "https://i.ytimg.com/vi/FJMMZ0lYc54/mqdefault.jpg",
-   "views": 110,
+   "views": 111,
    "likes": 3,
    "comments": 0,
    "duration": "PT10M"
@@ -84,7 +94,7 @@
    "title": "【🚨超重要🚨】みなさんへ大事なお知らせがあります！",
    "publishedAt": "2026-07-05T10:00:20Z",
    "thumbnail": "https://i.ytimg.com/vi/kPyKS03WAAI/mqdefault.jpg",
-   "views": 236,
+   "views": 237,
    "likes": 10,
    "comments": 0,
    "duration": "PT3M40S"
@@ -95,7 +105,7 @@
    "publishedAt": "2026-06-28T10:00:32Z",
    "thumbnail": "https://i.ytimg.com/vi/vUjXa_GtvSI/mqdefault.jpg",
    "views": 188,
-   "likes": 12,
+   "likes": 13,
    "comments": 0,
    "duration": "PT12M21S"
   },
@@ -114,7 +124,7 @@
    "title": "【本音】正直、想像と違いました。上場企業グループインして3ヶ月経っての本音。",
    "publishedAt": "2026-06-14T10:00:16Z",
    "thumbnail": "https://i.ytimg.com/vi/k9YCbZRv1GA/mqdefault.jpg",
-   "views": 182,
+   "views": 183,
    "likes": 11,
    "comments": 0,
    "duration": "PT9M18S"
@@ -124,7 +134,7 @@
    "title": "【告知】新音声コンテンツ全収録終了！",
    "publishedAt": "2026-06-07T10:00:13Z",
    "thumbnail": "https://i.ytimg.com/vi/1dg17XndFBY/mqdefault.jpg",
-   "views": 86,
+   "views": 87,
    "likes": 4,
    "comments": 0,
    "duration": "PT3M49S"
@@ -134,7 +144,7 @@
    "title": "借金500万から月300万を達成！！eBay講師尾形さん【せどり】【副業】【eBay】",
    "publishedAt": "2026-05-31T10:00:00Z",
    "thumbnail": "https://i.ytimg.com/vi/QedA_EvgOMw/mqdefault.jpg",
-   "views": 124,
+   "views": 125,
    "likes": 4,
    "comments": 0,
    "duration": "PT5M16S"
@@ -204,7 +214,7 @@
    "title": "【初登場】借金200万から年収3000万！年商10億まで登り上げたONEの最強の右腕となった晴菜さん【せどり】【副業】【AI】",
    "publishedAt": "2026-04-12T10:01:00Z",
    "thumbnail": "https://i.ytimg.com/vi/g4_NhHjMJCo/mqdefault.jpg",
-   "views": 275,
+   "views": 277,
    "likes": 7,
    "comments": 0,
    "duration": "PT7M59S"
@@ -224,7 +234,7 @@
    "title": "【久々登場】こはく君の100円コンテンツ販売します！【せどり】【副業】【メルカリ】",
    "publishedAt": "2026-03-29T10:00:00Z",
    "thumbnail": "https://i.ytimg.com/vi/ITkfPOGTYNU/mqdefault.jpg",
-   "views": 207,
+   "views": 209,
    "likes": 6,
    "comments": 0,
    "duration": "PT4M1S"
@@ -264,8 +274,8 @@
    "title": "Amazon物販で月1,000万!?Amazon講師のくぶきさん！【せどり】【副業】【Amazon】",
    "publishedAt": "2026-02-17T10:00:20Z",
    "thumbnail": "https://i.ytimg.com/vi/GzyiUn7uAM4/mqdefault.jpg",
-   "views": 261,
-   "likes": 3,
+   "views": 263,
+   "likes": 4,
    "comments": 0,
    "duration": "PT9M42S"
   },
@@ -314,7 +324,7 @@
    "title": "申し訳ございません【せどり】【副業】【メルカリ】",
    "publishedAt": "2026-01-11T10:00:35Z",
    "thumbnail": "https://i.ytimg.com/vi/MyphCDhmD9U/mqdefault.jpg",
-   "views": 207,
+   "views": 208,
    "likes": 5,
    "comments": 0,
    "duration": "PT3M50S"
@@ -344,7 +354,7 @@
    "title": "【ガチ成功者】月200万稼いだ元生徒が今は運営の〇〇に就任しました【せどり】【副業】【Amazon】",
    "publishedAt": "2025-12-21T10:00:06Z",
    "thumbnail": "https://i.ytimg.com/vi/3ZHezJWtWfE/mqdefault.jpg",
-   "views": 413,
+   "views": 418,
    "likes": 7,
    "comments": 0,
    "duration": "PT7M8S"
@@ -394,7 +404,7 @@
    "title": "ヒカルさんの10億のヴィラに最高の仲間とワーケーションに行ってきました！【せどり】【副業】【メルカリ】",
    "publishedAt": "2025-11-16T10:01:10Z",
    "thumbnail": "https://i.ytimg.com/vi/lJulgzLvEVE/mqdefault.jpg",
-   "views": 4211,
+   "views": 4212,
    "likes": 70,
    "comments": 0,
    "duration": "PT4M54S"
@@ -404,7 +414,7 @@
    "title": "【初心者必見】未経験でも月100万稼ぐ物販ロードマップ【せどり】【副業】【メルカリ】",
    "publishedAt": "2025-11-09T10:00:05Z",
    "thumbnail": "https://i.ytimg.com/vi/3Bl5tKYjq0A/mqdefault.jpg",
-   "views": 509,
+   "views": 510,
    "likes": 7,
    "comments": 0,
    "duration": "PT7M24S"
@@ -498,16 +508,6 @@
    "likes": 6,
    "comments": 0,
    "duration": "PT8M42S"
-  },
-  {
-   "id": "TVmAvKjZc0Q",
-   "title": "【報告】株式会社Smart Lifeを辞めることにしました！",
-   "publishedAt": "2025-09-07T10:00:43Z",
-   "thumbnail": "https://i.ytimg.com/vi/TVmAvKjZc0Q/mqdefault.jpg",
-   "views": 359,
-   "likes": 12,
-   "comments": 0,
-   "duration": "PT3M28S"
   }
  ],
  "history": [
@@ -864,6 +864,12 @@
    "subscriberCount": 6090,
    "viewCount": 346322,
    "videoCount": 426
+  },
+  {
+   "date": "2026-09-07",
+   "subscriberCount": 6090,
+   "viewCount": 346463,
+   "videoCount": 427
   }
  ]
 }
