@@ -1,11 +1,11 @@
 {
- "updatedAt": "2026-10-02T07:27:33+09:00",
+ "updatedAt": "2026-10-03T06:57:14+09:00",
  "channel": {
   "id": "UCjqBCrrp1mfDBTKxyzMUgrA",
   "title": "かず | ONE代表",
   "thumbnail": "https://yt3.ggpht.com/yQhIMJ_RzIpvdQcO-pvnD2ywPkbEg49xDlbBpaS5GV__KAkQnfpwHjEwpA0fyQnkVlWvSc845Q=s240-c-k-c0x00ffffff-no-rj",
   "subscriberCount": 6100,
-  "viewCount": 348692,
+  "viewCount": 348743,
   "videoCount": 428
  },
  "videos": [
@@ -14,7 +14,7 @@
    "title": "もしゼロから事業を始めるとしたら",
    "publishedAt": "2026-09-13T09:00:26Z",
    "thumbnail": "https://i.ytimg.com/vi/ZlY5gyG-iHI/mqdefault.jpg",
-   "views": 216,
+   "views": 222,
    "likes": 3,
    "comments": 0,
    "duration": "PT3M24S"
@@ -24,7 +24,7 @@
    "title": "【募集】スクール事業やってる方へ",
    "publishedAt": "2026-09-06T09:00:19Z",
    "thumbnail": "https://i.ytimg.com/vi/LE1q2n_iUQ8/mqdefault.jpg",
-   "views": 255,
+   "views": 256,
    "likes": 2,
    "comments": 0,
    "duration": "PT7M5S"
@@ -34,7 +34,7 @@
    "title": "【初心者向け】AIに月3000円課金するなら？絶対にClaude Code一択！！",
    "publishedAt": "2026-08-30T09:00:10Z",
    "thumbnail": "https://i.ytimg.com/vi/VxjOTGnBo1A/mqdefault.jpg",
-   "views": 321,
+   "views": 322,
    "likes": 7,
    "comments": 0,
    "duration": "PT4M29S"
@@ -44,7 +44,7 @@
    "title": "今一番熱い投資はコレ！",
    "publishedAt": "2026-08-23T09:00:27Z",
    "thumbnail": "https://i.ytimg.com/vi/NVW3QhlxAQs/mqdefault.jpg",
-   "views": 186,
+   "views": 188,
    "likes": 8,
    "comments": 0,
    "duration": "PT7M53S"
@@ -64,7 +64,7 @@
    "title": "【参加者1000名】ONEぶち上げオフ会に密着",
    "publishedAt": "2026-08-07T09:00:18Z",
    "thumbnail": "https://i.ytimg.com/vi/Or14A2H2FR8/mqdefault.jpg",
-   "views": 398,
+   "views": 400,
    "likes": 17,
    "comments": 0,
    "duration": "PT16M33S"
@@ -114,7 +114,7 @@
    "title": "Amazon電脳で月100万達成できたマキさんに来てもらいましたin沖縄！【副業】【せどり】【Amazon】",
    "publishedAt": "2026-06-28T10:00:32Z",
    "thumbnail": "https://i.ytimg.com/vi/vUjXa_GtvSI/mqdefault.jpg",
-   "views": 240,
+   "views": 243,
    "likes": 13,
    "comments": 0,
    "duration": "PT12M21S"
@@ -364,7 +364,7 @@
    "title": "【ガチ成功者】月200万稼いだ元生徒が今は運営の〇〇に就任しました【せどり】【副業】【Amazon】",
    "publishedAt": "2025-12-21T10:00:06Z",
    "thumbnail": "https://i.ytimg.com/vi/3ZHezJWtWfE/mqdefault.jpg",
-   "views": 488,
+   "views": 489,
    "likes": 7,
    "comments": 0,
    "duration": "PT7M8S"
@@ -1019,6 +1019,12 @@
    "date": "2026-10-02",
    "subscriberCount": 6100,
    "viewCount": 348692,
+   "videoCount": 428
+  },
+  {
+   "date": "2026-10-03",
+   "subscriberCount": 6100,
+   "viewCount": 348743,
    "videoCount": 428
   }
  ]
