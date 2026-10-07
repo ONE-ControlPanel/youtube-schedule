@@ -1,4 +1,4 @@
-name: データを毎日自動更新（CSV＋YouTubeアナリティクス）
+name: データを毎日自動更新（CSV）
 
 on:
   # 毎日 午前3時（日本時間）に自動実行 = UTC 18:00
@@ -26,12 +26,6 @@ jobs:
       - name: GoogleスプレッドシートからCSVを取得してindex.htmlを更新
         run: python scripts/update_csv.py
 
-      - name: YouTubeアナリティクスデータを更新
-        env:
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-          YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
-        run: python scripts/update_analytics.py
-
       # GitHub Pagesはmainブランチから直接配信されているため、
       # コミット＆プッシュするだけで自動的にサイトへ反映される
       - name: 変更があればコミット＆プッシュ
@@ -43,7 +37,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "変更なし - スキップ"
           else
-            git commit -m "chore: スケジュールCSVとアナリティクスデータを自動更新"
+            git commit -m "chore: スケジュールCSVを自動更新"
             git pull --rebase origin main
             git push
           fi
